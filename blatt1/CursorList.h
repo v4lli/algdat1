@@ -1,7 +1,40 @@
-template <class T> class List {
-	public:
+#include <iostream>     // std::cout
+#include <iterator>     // std::iterator, std::input_iterator_tag
+
+template <class T> class CursorIterator : public std::iterator<std::input_iterator_tag, int>
+{
+private:
+	int* p;
+public:
+
+	CursorIterator(int* x) :p(x) {}
+	CursorIterator(const CursorIterator<T>& mit) : p(mit.p) {}
+	CursorIterator& operator++() {++p;return *this;}
+	CursorIterator operator++(int) {CursorIterator tmp(*this); operator++(); return tmp;}
+	bool operator==(const CursorIterator& rhs) const {return p==rhs.p;}
+	bool operator!=(const CursorIterator& rhs) const {return p!=rhs.p;}
+	int& operator*() {return *p;}
+};
+
+template <class T, unsigned int SIZE> class List {
+private:
+	unsigned int start_data;
+	unsigned int start_free;
+	unsigned int max_size;
+
+	struct item {
+		T data;
+		int next;
+		int prev;
+	};
+
+	struct item data[SIZE];
+
+	typedef CursorIterator<T> iterator;
+
+public:
+		List<T>(unsigned int size);
 		typedef T value_type;
-		typedef ListIterator<T> iterator;
 		bool empty() const;
 		int size() const;
 		T& front() const;
