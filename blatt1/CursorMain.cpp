@@ -1,12 +1,14 @@
-#include <stdio.c>
+#include <cstdio>
+#include "CursorList.h"
 
-#define DUMP() (\
-	printf("lst.empty() = %b\n", lst.empty()); \
-	printf("lst.size() = %b\n", lst.size()); \
-	printf("lst.front() = %p\n", lst.front());)
+#define DUMP() {\
+	printf("lst.empty() = %d\n", lst.empty()); \
+	printf("lst.size() = %d\n", lst.size()); \
+	printf("lst.front() = %d\n", lst.front());\
+}
 
 int main(void) {
-	auto lst = new CursorList<int>(128);
+	auto lst = List<int, 128>();
 
 	DUMP();
 

@@ -20,7 +20,6 @@ template <class T, unsigned int SIZE> class List {
 private:
 	unsigned int start_data;
 	unsigned int start_free;
-	unsigned int max_size;
 
 	struct item {
 		T data;
@@ -33,7 +32,7 @@ private:
 	typedef CursorIterator<T> iterator;
 
 public:
-		List<T>(unsigned int size);
+		List();
 		typedef T value_type;
 		bool empty() const;
 		int size() const;
