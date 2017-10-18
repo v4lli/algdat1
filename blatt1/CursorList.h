@@ -2,34 +2,6 @@
 #include <iterator>     // std::iterator, std::input_iterator_tag
 #include <cassert>
 
-//template <class T> class CursorIterator : public std::iterator<std::input_iterator_tag, int>
-//{
-//private:
-//	int* p;
-//public:
-//
-//	CursorIterator(int* x) : p(x) {}
-//	CursorIterator(const CursorIterator<T> &mit) : p(mit.p) {}
-//	CursorIterator& operator++() {
-//		++p;
-//		return *this;
-//	}
-//	CursorIterator operator++(int) {
-//		CursorIterator tmp(*this);
-//		operator++();
-//		return tmp;
-//	}
-//	bool operator==(const CursorIterator& rhs) const {
-//		return p==rhs.p;
-//	}
-//	bool operator!=(const CursorIterator& rhs) const {
-//		return p!=rhs.p;
-//	}
-//	int& operator*() {
-//		return *p;
-//	}
-//};
-
 template <class T> class CursorIterator
 {
 private:
@@ -46,7 +18,7 @@ public:
 		data = (struct item *)storage;
 		// XXX unschoen, keine voidpointer am besten
 		idx = start_at;
-		printf("new iterator with dataptr=%p\n", data);
+		//printf("new iterator with dataptr=%p\n", data);
 	}
 
 	typedef CursorIterator<T> iterator;
@@ -71,14 +43,14 @@ public:
 		return (getIdx() != rhs.getIdx()) || (getDataPtr() != rhs.getDataPtr());
 	}
 	bool operator== (const iterator& rhs) const {
-		printf("getIdx() == rhs.getIdx() = %d\n", getIdx() == rhs.getIdx());
-		printf("getDataPtr() == rhs.getDataPtr() = %d\n", getDataPtr() == rhs.getDataPtr());
 		return (getIdx() == rhs.getIdx()) && (getDataPtr() == rhs.getDataPtr());
 	}
 	iterator& operator++ () {
+		idx++;
 		return this;
 	}
 	iterator operator++ (int) {// postfix operator, dummy parameter
+		idx++;
 		return this;
 	}
 };
@@ -180,9 +152,10 @@ public:
 
 		start_data = start_free;
 		start_free = find_free();
-		printf("Added new element to the front; start_free=%d, start_data=%d\n", start_free, start_data);
+		//printf("Added new element to the front; start_free=%d, start_data=%d\n", start_free, start_data);
 	}
 
+	// macht noch was falsches... XXX ist aktuell pop_back()
 	void pop_front() {
 		int deleted = start_data;
 
@@ -192,16 +165,15 @@ public:
 		data[deleted].prev = -1;
 		data[deleted].next = -1;
 
-		start_free = 0;
+		start_free = deleted;
 	}
 
 	iterator begin() const {
-		return new iterator((void*)&data, 0);
+		return iterator((void*)&data, 0);
 	}
 
 	iterator end() const {
-		// XXX passt?
-		return new iterator((void*)&data, SIZE);
+		return iterator((void*)&data, size());
 	}
 
 	// sollen constant-time benoetigen:
