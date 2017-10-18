@@ -2,8 +2,14 @@
 CC=g++
 
 cursor:
-	$(CC) -c -std=c++11 CursorMain.cpp -o CursorMain.o
-	$(CC) -o cursormain CursorMain.o
+	$(CC) -g -c -std=c++11 CursorMain.cpp -o CursorMain.o
+	$(CC) -g -o cursormain CursorMain.o
 
 clean:
 	rm -f cursormain *.o
+
+test: cursor
+	./cursormain
+
+debug: cursor
+	lldb ./cursormain

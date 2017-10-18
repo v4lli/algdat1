@@ -2,31 +2,84 @@
 #include <iterator>     // std::iterator, std::input_iterator_tag
 #include <cassert>
 
-template <class T> class CursorIterator : public std::iterator<std::input_iterator_tag, int>
+//template <class T> class CursorIterator : public std::iterator<std::input_iterator_tag, int>
+//{
+//private:
+//	int* p;
+//public:
+//
+//	CursorIterator(int* x) : p(x) {}
+//	CursorIterator(const CursorIterator<T> &mit) : p(mit.p) {}
+//	CursorIterator& operator++() {
+//		++p;
+//		return *this;
+//	}
+//	CursorIterator operator++(int) {
+//		CursorIterator tmp(*this);
+//		operator++();
+//		return tmp;
+//	}
+//	bool operator==(const CursorIterator& rhs) const {
+//		return p==rhs.p;
+//	}
+//	bool operator!=(const CursorIterator& rhs) const {
+//		return p!=rhs.p;
+//	}
+//	int& operator*() {
+//		return *p;
+//	}
+//};
+
+template <class T> class CursorIterator
 {
 private:
-	int* p;
-public:
+	struct item {
+		T data;
+		int next;
+		int prev;
+	};
+	int idx;
+	struct item *data;
 
-	CursorIterator(int* x) : p(x) {}
-	CursorIterator(const CursorIterator<T> &mit) : p(mit.p) {}
-	CursorIterator& operator++() {
-		++p;
-		return *this;
+public:
+	CursorIterator(void *storage, int start_at = 0) {
+		data = (struct item *)storage;
+		// XXX unschoen, keine voidpointer am besten
+		idx = start_at;
+		printf("new iterator with dataptr=%p\n", data);
 	}
-	CursorIterator operator++(int) {
-		CursorIterator tmp(*this);
-		operator++();
-		return tmp;
+
+	typedef CursorIterator<T> iterator;
+
+	T& operator* () {
+		return (data + idx)->data;
 	}
-	bool operator==(const CursorIterator& rhs) const {
-		return p==rhs.p;
+
+	iterator& operator= (const iterator& rhs) {
+		return rhs;
 	}
-	bool operator!=(const CursorIterator& rhs) const {
-		return p!=rhs.p;
+
+	int getIdx() const {
+		return idx;
 	}
-	int& operator*() {
-		return *p;
+
+	struct item *getDataPtr() const {
+		return data;
+	}
+
+	bool operator!= (const iterator& rhs) const {
+		return (getIdx() != rhs.getIdx()) || (getDataPtr() != rhs.getDataPtr());
+	}
+	bool operator== (const iterator& rhs) const {
+		printf("getIdx() == rhs.getIdx() = %d\n", getIdx() == rhs.getIdx());
+		printf("getDataPtr() == rhs.getDataPtr() = %d\n", getDataPtr() == rhs.getDataPtr());
+		return (getIdx() == rhs.getIdx()) && (getDataPtr() == rhs.getDataPtr());
+	}
+	iterator& operator++ () {
+		return this;
+	}
+	iterator operator++ (int) {// postfix operator, dummy parameter
+		return this;
 	}
 };
 
@@ -46,7 +99,7 @@ private:
 	typedef CursorIterator<T> iterator;
 
 public:
-	List() : start_data(0), start_free(0) {
+	List() : start_data(-1), start_free(0) {
 		// initialize list with correct, empty valyes
 		struct item empty;
 		empty.next = -1;
@@ -61,7 +114,7 @@ public:
 
 	typedef T value_type;
 	bool empty() const {
-		if (data[start_data].next == -1)
+		if (start_data == -1)
 			return true;
 		else
 			return false;
@@ -69,9 +122,13 @@ public:
 
 	int size() const
 	{
+		if (start_data == -1)
+			return 0;
+
 		const struct item *current = &data[start_data];
-		int counter = 0;
+		int counter = 1;
 		while (current->next != -1) {
+			//printf("current->next=%d\n", current->next);
 			counter++;
 			assert(current->next <= SIZE);
 			current = &data[current->next];
@@ -91,14 +148,16 @@ private:
 		// find next free element XXX make more efficient
 		int free = -1;
 		for (int i = 0; i < SIZE; i++) {
-			struct item *current = data[i];
-			if (current->next == -1 && current->prev == -1) {
+			struct item *current = &data[i];
+			if (current->next == -1 && current->prev == -1 && i != start_data) {
 				free = i;
 				break;
 			}
 		}
 		return free;
 	}
+
+public:
 
 	void push_front(const T &param) // add a new value to the front of a list
 	{
@@ -108,15 +167,22 @@ private:
 			return;
 		}
 
-		data[start_free].next = start_data;
-		data[start_free].data = *param;
-		data[start_free].prev = -1;
+		if (empty()) {
+			data[start_free].next = -1;
+			data[start_free].prev = -1;
+			data[start_free].data = param;
+		} else {
+			data[start_free].next = start_data;
+			data[start_free].prev = -1;
+			data[start_free].data = param;
+			data[start_data].prev = start_free;
+		}
 
-		data[start_data].prev = start_free;
-		start_data = find_free();
+		start_data = start_free;
+		start_free = find_free();
+		printf("Added new element to the front; start_free=%d, start_data=%d\n", start_free, start_data);
 	}
 
-public:
 	void pop_front() {
 		int deleted = start_data;
 
@@ -130,12 +196,12 @@ public:
 	}
 
 	iterator begin() const {
-		return new iterator(0);
+		return new iterator((void*)&data, 0);
 	}
 
 	iterator end() const {
 		// XXX passt?
-		return new iterator(SIZE - 1);
+		return new iterator((void*)&data, SIZE);
 	}
 
 	// sollen constant-time benoetigen:
