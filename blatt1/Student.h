@@ -9,25 +9,46 @@
 #define STUDENT_H_
 
 #include <iostream>
+using namespace std;
 
 class Student {
-private:
-	int Matrikelnummer;
-	char[10] Name;
-	char[10] Vorname;
-	char[9] Geburtstag;
-
 public:
+	// Konstruktor und Destruktor
 	Student();
 	virtual ~Student();
-	bool operator==(const Student &s1, const Student &s2);
-	bool operator!=(const Student &s1, const Student &s2);
-	bool operator>=(const Student &s1, const Student &s2);
-	bool operator<=(const Student &s1, const Student &s2);
-	bool operator>(const Student &s1, const Student &s2);
-	bool operator<(const Student &s1, const Student &s2);
-	write(ostream& ostr)const;
-	read(istream& istr);
+	// Getter
+	int getMatNummer();
+	char* getName();
+	char* getVorname();
+	char* getGebTag();
+	// Setter
+	void setMatNummer(int);
+	void setName(char*);
+	void setVorname(char*);
+	void setGebTag(char*);
+	// Vergleichsoperatoren
+	bool operator==(Student &s2);
+	bool operator!=(Student &s2);
+	bool operator>=(Student &s2);
+	bool operator<=(Student &s2);
+	bool operator>(Student &s2);
+	bool operator<(Student &s2);
+	// Read und Write
+	virtual void write(ostream& ostr);
+	virtual void read(istream& istr);
+
 };
+
+// Stream-Operatoren
+ostream& operator << (ostream& ostr, Student& stud)
+{
+	stud.write(ostr);
+	return ostr;
+}
+istream& operator >> (istream& istr, Student& stud)
+{
+	stud.read(istr);
+	return istr;
+}
 
 #endif /* STUDENT_H_ */
