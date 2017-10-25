@@ -36,7 +36,7 @@ Student::~Student()
 /**
  * Getter fuer die Matrikelnummer.
  */
-int Student::getMatNummer()
+int Student::getMatNummer() const
 {
 	return Matrikelnummer;
 }
@@ -52,7 +52,7 @@ void Student::setMatNummer(int neuMatNum)
 /**
  * Getter fuer den Namen.
  */
-char* Student::getName()
+char* Student::getName() const
 {
 	return Name;
 }
@@ -64,14 +64,14 @@ char* Student::getName()
  */
 void Student::setName(char neuName[])
 {
-	strncpy(neuName, Name, 10);
+	strncpy(Name, neuName, 10);
 	Name[9] = '\0';
 }
 
 /**
  * Getter fuer den Vornamen.
  */
-char* Student::getVorname()
+char* Student::getVorname() const
 {
 	return Vorname;
 }
@@ -83,14 +83,14 @@ char* Student::getVorname()
  */
 void Student::setVorname(char neuVorname[])
 {
-	strncpy(neuVorname, Vorname, 10);
+	strncpy(Vorname, neuVorname, 10);
 	Vorname[9] = '\0';
 }
 
 /**
  * Getter fuer den Geburtstag.
  */
-char* Student::getGebTag()
+char* Student::getGebTag() const
 {
 	return Geburtstag;
 }
@@ -102,7 +102,7 @@ char* Student::getGebTag()
  */
 void Student::setGebTag(char neuGebTag[])
 {
-	strncpy(neuGebTag, Geburtstag, 9);
+	strncpy(Geburtstag, neuGebTag, 9);
 	Geburtstag[8] = '\0';
 }
 
@@ -157,7 +157,7 @@ bool Student::operator<(Student &s2)
 /**
  * Liest aus einem eingehenden Stream alle Attribute aus.
  */
-void read(istream& istr)
+void Student::read(istream& istr)
 {
 	istr >> Matrikelnummer;
 	istr >> Name;
@@ -170,12 +170,13 @@ void read(istream& istr)
  */
 void Student::write(ostream& ostr) const
 {
-	ostr << this->getMatNummer() << getName() << getVorname() << getGebTag();
+	ostr << getMatNummer() << getName() << getVorname() << getGebTag();
 }
 
 // Stream-Operatoren
 ostream& operator << (ostream& ostr, const Student& stud)
 {
+	cout << "Hier";
 	stud.write(ostr);
 	return ostr;
 }

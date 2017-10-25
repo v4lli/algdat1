@@ -17,10 +17,10 @@ public:
 	Student();
 	virtual ~Student();
 	// Getter
-	int getMatNummer();
-	char* getName();
-	char* getVorname();
-	char* getGebTag();
+	int getMatNummer() const;
+	char* getName() const;
+	char* getVorname() const;
+	char* getGebTag() const;
 	// Setter
 	void setMatNummer(int);
 	void setName(char*);
