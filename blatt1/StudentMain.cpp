@@ -31,6 +31,7 @@ int main(void)
 	s2.setGebTag("02.02.02");
 
 	// Testen, ob die 'ToString' funktioniert.
+	//s2.write(cout);
 	cout << &s2 << endl;
 
 	// Vergleiche Testen.

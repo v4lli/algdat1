@@ -39,4 +39,7 @@ public:
 
 };
 
+inline ostream& operator << (ostream& ostr, const Student& stud);
+inline istream& operator >> (istream& istr, Student& stud);
+
 #endif /* STUDENT_H_ */
