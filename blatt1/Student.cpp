@@ -22,9 +22,6 @@ char Geburtstag[9];
 Student::Student()
 {
 	Matrikelnummer = 0;
-	Name = '\0';
-	Vorname = '\0';
-	Geburtstag = '\0';
 }
 
 /**
@@ -34,9 +31,6 @@ Student::Student()
 Student::~Student()
 {
 	Matrikelnummer = 0;
-	Name = '\0';
-	Vorname = '\0';
-	Geburtstag = '\0';
 }
 
 /**
@@ -174,7 +168,19 @@ void read(istream& istr)
 /**
  * Schreibt auf einen ausgehenden Stream alle Attribute.
  */
-void Student::write(ostream& ostr)
+void Student::write(ostream& ostr) const
 {
-	ostr << getMatNummer() << getName() << getVorname() << getGebTag();
+	ostr << this->getMatNummer() << getName() << getVorname() << getGebTag();
+}
+
+// Stream-Operatoren
+ostream& operator << (ostream& ostr, const Student& stud)
+{
+	stud.write(ostr);
+	return ostr;
+}
+istream& operator >> (istream& istr, Student& stud)
+{
+	stud.read(istr);
+	return istr;
 }

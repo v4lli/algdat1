@@ -34,21 +34,9 @@ public:
 	bool operator>(Student &s2);
 	bool operator<(Student &s2);
 	// Read und Write
-	virtual void write(ostream& ostr);
+	virtual void write(ostream& ostr) const;
 	virtual void read(istream& istr);
 
 };
-
-// Stream-Operatoren
-ostream& operator << (ostream& ostr, Student& stud)
-{
-	stud.write(ostr);
-	return ostr;
-}
-istream& operator >> (istream& istr, Student& stud)
-{
-	stud.read(istr);
-	return istr;
-}
 
 #endif /* STUDENT_H_ */
