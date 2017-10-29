@@ -5,13 +5,13 @@
 	printf("############### DUMP BGN ###############\n"); \
 	printf("# lst.empty() = %d\n", lst.empty()); \
 	printf("# lst.size() = %d\n# Content: ", lst.size()); \
-	for (CursorIterator<int> it=lst.begin(); it != lst.end(); it++) \
+	for (auto it=lst.begin(); it != lst.end(); ++it) \
 		printf("%d, ", *it); \
 	printf("\n############### DUMP END ###############\n"); \
 }
 
 int main(void) {
-	auto lst = List<int, 128>();
+	auto lst = CursorList<int, 128>();
 
 	// test push_front(), empty(), size() and pop_front(), iterator.begin()
 	// iterator.end(), iterator* and iterator++
@@ -39,16 +39,16 @@ int main(void) {
 	lst.push_front(40);
 	lst.push_front(50);
 	DUMP();
-	CursorIterator<int> ins = lst.begin();
+	auto ins = lst.begin();
 	ins++;
 	printf("insert at pos1\n");
 	lst.insert(ins, 45);
 	DUMP();
 	printf("delete element 3-4 (40,30)\n");
-	CursorIterator<int> del = lst.begin();
+	auto del = lst.begin();
 	del++;
 	del++;
-	CursorIterator<int> del_end = CursorIterator<int>(del);
+	auto del_end = CursorList<int, 128>::CursorIterator(del);
 	del_end++;
 	lst.erase(del, del_end);
 	DUMP();
@@ -61,12 +61,13 @@ int main(void) {
 	lst.erase(lst.begin());
 	DUMP();
 	printf("\n\n");
+	lst.front();
 
 	// Test iterator copy constructor
-	CursorIterator<int> it=lst.begin();
-	CursorIterator<int> it2(it);
-	CursorIterator<int> it_end=lst.end();
-	CursorIterator<int> it2_end(it_end);
+	CursorList<int, 128>::CursorIterator it=lst.begin();
+	CursorList<int, 128>::CursorIterator it2(it);
+	CursorList<int, 128>::CursorIterator it_end=lst.end();
+	CursorList<int, 128>::CursorIterator it2_end(it_end);
 	printf("it==it2: %d (should be 1)\n", it == it2);
 	printf("it2_end==it: %d (should be 0)\n", it2_end == it);
 

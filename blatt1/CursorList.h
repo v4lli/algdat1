@@ -5,79 +5,13 @@
 #define ITERATOR_END -2
 #define SLOT_EMPTY -1
 
-template <class T> class CursorIterator
-{
+template <class T, unsigned int SIZE>
+class CursorList {
 private:
-	struct item {
-		T data;
-		int next;
-		int prev;
-	};
-	int idx;
-	struct item *data;
+	int start_data;
+	int start_free;
 
-	void increment() {
-		if (idx == ITERATOR_END)
-			throw std::logic_error("Increment iterator end\n");
-
-		idx = (data + getIdx())->next;
-		if (idx < 0)
-			idx = ITERATOR_END;
-	}
-
-public:
-	typedef CursorIterator<T> iterator;
-
-	CursorIterator(void *storage, int start_at = 0) {
-		// XXX unschoen, keine opaque pointer sondern struct item
-		data = (struct item *)storage;
-		idx = start_at;
-	}
-
-	int getIdx() const {
-		return idx;
-	}
-
-	struct item *getDataPtr() const {
-		return data;
-	}
-
-	T& operator* () {
-		if (idx == ITERATOR_END)
-			throw std::logic_error("Dereferenced iterator end\n");
-		else
-			return (data + getIdx())->data;
-	}
-
-	iterator& operator= (const iterator& rhs) {
-		auto itr = new CursorIterator<T>(rhs.getDataPtr(), rhs.getIdx());
-		return itr;
-	}
-
-	bool operator!= (const iterator& rhs) const {
-		return (getIdx() != rhs.getIdx()) || (getDataPtr() != rhs.getDataPtr());
-	}
-
-	bool operator== (const iterator& rhs) const {
-		return (getIdx() == rhs.getIdx()) && (getDataPtr() == rhs.getDataPtr());
-	}
-
-	iterator& operator++ () { // prefix increment operator
-		increment();
-		return *this;
-	}
-
-	iterator operator++ (int) { // postfix increment operator
-		increment();
-		return this;
-	}
-};
-
-template <class T, unsigned int SIZE> class List {
-private:
-	unsigned int start_data;
-	unsigned int start_free;
-
+protected:
 	struct item {
 		T data;
 		int next;
@@ -86,10 +20,69 @@ private:
 
 	struct item data[SIZE];
 
-	typedef CursorIterator<T> iterator;
+public:
+
+	const class CursorIterator {
+	private:
+		int idx;
+		struct item *parent_data;
+
+		void increment() {
+			if (idx == ITERATOR_END)
+				throw std::logic_error("Increment iterator end\n");
+
+			idx = (parent_data+getIdx())->next;
+			if (idx < 0)
+				idx = ITERATOR_END;
+		}
+
+	public:
+
+		CursorIterator(const CursorList& parent, int start_at = 0)
+		    : idx(start_at), parent_data((struct item*)(&parent.data[0])) { }
+
+		int getIdx() const {
+			return idx;
+		}
+
+		const struct item *getDataPtr() const {
+			return parent_data;
+		}
+
+		T& operator* () {
+			if (idx == ITERATOR_END)
+				throw std::logic_error("Dereferenced iterator end\n");
+			else
+				return (parent_data+getIdx())->data;
+		}
+
+		CursorIterator& operator= (const CursorIterator& rhs) {
+			return new CursorIterator(rhs.getDataPtr(), rhs.getIdx());
+		}
+
+		bool operator!= (const CursorIterator& rhs) const {
+			return (getIdx() != rhs.getIdx()) || (getDataPtr() != rhs.getDataPtr());
+		}
+
+		bool operator== (const CursorIterator& rhs) const {
+			return (getIdx() == rhs.getIdx()) && (getDataPtr() == rhs.getDataPtr());
+		}
+
+		CursorIterator& operator++ () { // prefix increment operator
+			increment();
+			return *this;
+		}
+
+		CursorIterator operator++ (int) { // postfix increment operator
+			increment();
+			return *this;
+		}
+	};
 
 public:
-	List() : start_data(SLOT_EMPTY), start_free(0) {
+	typedef CursorIterator iterator;
+
+	CursorList() : start_data(SLOT_EMPTY), start_free(0) {
 		// initialize list with correct, empty valyes
 		struct item empty;
 		empty.next = SLOT_EMPTY;
@@ -100,11 +93,12 @@ public:
 
 #ifdef DEBUG
 		printf("Initialized new List with %d elements; sizeof(data)=%ld\n",
-			SIZE, sizeof(data));
+				SIZE, sizeof(data));
 #endif
 	}
 
-	typedef T value_type;
+	typedef T value_type; // XXX unused
+
 	bool empty() const {
 		if (start_data == SLOT_EMPTY)
 			return true;
@@ -112,8 +106,7 @@ public:
 			return false;
 	}
 
-	int size() const
-	{
+	int size() const {
 		if (start_data == SLOT_EMPTY)
 			return 0;
 
@@ -128,20 +121,19 @@ public:
 		return counter;
 	}
 
-	T& front() const {
-		int foo = data[start_data].data;
-		return foo;
-		// XXX richtig schlecht
+	T& front() {
+		return data[start_data].data;
 	}
 
 private:
+	// XXX muss weg, ist eigentlich unnoetig wenn eine freelist gepflegt wird
 	int find_free() {
 		int free = SLOT_EMPTY;
 		for (int i = 0; i < SIZE; i++) {
 			struct item *current = &data[i];
 			if (current->next == SLOT_EMPTY
-			    && current->prev == SLOT_EMPTY
-			    && i != start_data) {
+					&& current->prev == SLOT_EMPTY
+					&& i != start_data) {
 				free = i;
 				break;
 			}
@@ -166,7 +158,6 @@ private:
 	}
 
 public:
-
 	void push_front(const T &param) // add a new value to the front of a list
 	{
 
@@ -207,11 +198,11 @@ public:
 		else
 			iterator_start = start_data;
 
-		return iterator((void*)&data, iterator_start);
+		return iterator(*this, iterator_start);
 	}
 
 	iterator end() const {
-		return iterator((void*)&data, ITERATOR_END);
+		return iterator(*this, ITERATOR_END);
 	}
 
 	// sollen constant-time benoetigen:
@@ -244,12 +235,6 @@ public:
 		int start_idx = start.getIdx();
 		assert(start_idx >= 0);
 		int stop_idx = stop.getIdx();
-
-		// XXX handle specialcases:
-		// - start = start of list
-		// - end = end of list
-		//
-		// XXX asserts
 
 		struct item *start_item = &data[start_idx];
 		struct item *prev_to_start = &data[start_item->prev];
@@ -287,5 +272,3 @@ public:
 		return erase(itr, ++itr);
 	}
 };
-
-// XXX iterator invalidation bei insert bzw erase
