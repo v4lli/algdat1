@@ -5,8 +5,8 @@
  *      Author: Angelika
  */
 
-#ifndef STUDNETMAIN_H_
-#define STUDNETMAIN_H_
+#ifndef STUDENTMAIN_H_
+#define STUDENTMAIN_H_
 
 class StudentMain{
 	int main(void);
@@ -14,4 +14,4 @@ class StudentMain{
 
 
 
-#endif /* STUDNETMAIN_H_ */
+#endif /* STUDENTMAIN_H_ */
