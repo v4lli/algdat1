@@ -20,6 +20,8 @@ protected:
 
 	struct item data[SIZE];
 
+	struct item free[SIZE];
+
 public:
 
 	const class CursorIterator {
@@ -83,6 +85,15 @@ public:
 	typedef CursorIterator iterator;
 
 	CursorList() : start_data(SLOT_EMPTY), start_free(0) {
+		// initialize free-list with correct connections.
+		free[0].next = 1;
+		for(int i = 1; i < SIZE - 1; i ++)
+		{
+			free[i].next = i + 1;
+			free[i].prev = i - 1;
+		}
+		free[SIZE - 1].prev = SIZE-2;
+
 		// initialize list with correct, empty valyes
 		struct item empty;
 		empty.next = SLOT_EMPTY;
@@ -126,6 +137,28 @@ public:
 	}
 
 private:
+	void free_push_front(int index)
+	{
+		free[index].next = start_free;
+		free[start_free].prev = index;
+		start_free = index;
+	}
+
+	int free_pop_front()
+	{
+		int index = start_free;
+		start_free = free[index].next;
+		free[index].next = SLOT_EMPTY;
+		free[start_free].prev = SLOT_EMPTY;
+
+		return index;
+	}
+
+	int get_free()
+	{
+		return start_free;
+	}
+
 	// XXX muss weg, ist eigentlich unnoetig wenn eine freelist gepflegt wird
 	int find_free() {
 		int free = SLOT_EMPTY;
