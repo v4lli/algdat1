@@ -263,6 +263,7 @@ public:
 		return itr;
 	}
 
+	// XXX stop ist nicht exclusive sondern inclusive
 	iterator erase(iterator start, iterator stop) // stop exclusive
 	{
 		int start_idx = start.getIdx();
