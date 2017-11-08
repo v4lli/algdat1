@@ -1,6 +1,7 @@
 #include <iostream>     // std::cout
 #include <iterator>     // std::iterator, std::input_iterator_tag
 #include <cassert>
+#include <cstring>
 
 #define ITERATOR_END -2
 #define SLOT_EMPTY -1
@@ -22,15 +23,17 @@ protected:
 
 public:
 
-	const class CursorIterator {
+	class CursorIterator {
 	private:
 		int idx;
+		int prev_idx;
 		struct item *parent_data;
 
 		void increment() {
 			if (idx == ITERATOR_END)
 				throw std::logic_error("Increment iterator end\n");
 
+			prev_idx = idx;
 			idx = (parent_data+getIdx())->next;
 			if (idx < 0)
 				idx = ITERATOR_END;
@@ -39,10 +42,27 @@ public:
 	public:
 
 		CursorIterator(const CursorList& parent, int start_at = 0)
-		    : idx(start_at), parent_data((struct item*)(&parent.data[0])) { }
+		    : idx(start_at), prev_idx(ITERATOR_END), parent_data((struct item*)(&parent.data[0])) {
+			// prev_index korrekt setzen.
+			if(start_at == ITERATOR_END)
+			{
+				int next = start_data;
+				struct item* current = NULL;
+				while (next >= 0) {
+					next = &data[next];
+					prev_idx = next;
+
+					next = current->next;
+				}
+			}
+		}
 
 		int getIdx() const {
 			return idx;
+		}
+
+		int getPrevIdx() const{
+			return prev_idx;
 		}
 
 		const struct item *getDataPtr() const {
@@ -94,12 +114,12 @@ public:
 		data[SIZE - 1].next = SLOT_EMPTY;
 
 		// initialize list with correct, empty valyes
-		struct item empty;
+		/*struct item empty;
 		empty.next = SLOT_EMPTY;
 		empty.prev = SLOT_EMPTY;
 		empty.data = 0;
 		for(int i = 0; i < SIZE; i++)
-			memcpy(&data[i], &empty, sizeof(struct item));
+			memcpy(&data[i], &empty, sizeof(struct item));*/
 
 #ifdef DEBUG
 		printf("Initialized new List with %d elements; sizeof(data)=%ld\n",
@@ -136,41 +156,56 @@ public:
 	}
 
 private:
+	/**
+	 * Hinzufuegen eines neuen freien Elements.
+	 */
 	void free_push_front(int index)
 	{
+		// Fehlerhafte Eingaben abfangen.
+		if (index < 0)
+			throw std::runtime_error("Bad parameter");
+
+		// Einbinden des neuen Elements.
 		data[index].next = start_free;
-		data[start_free].prev = index;
+		if(start_free != SLOT_EMPTY)
+			data[start_free].prev = index;
+
+		// Start-Index neu setzen.
 		start_free = index;
 	}
 
+/**
+ * Hinzufügen einer Kette von neuen freien Elementen.
+ */
+	void free_push_front(int startIndex, int endIndex)
+	{
+		// Fehlerhafte Eingaben abfangen.
+		if(startIndex < 0 || endIndex < 0)
+			throw std::runtime_error("Bad parameters");
+
+		//
+		data[endIndex].next = start_free;
+		if(start_free != SLOT_EMPTY)
+			data[start_free].prev = endIndex;
+		start_free = startIndex;
+	}
+
+	/**
+	 * Entfernen (belegen) eines freien Elements.
+	 */
 	int free_pop_front()
 	{
 		int index = start_free;
-		start_free = data[index].next;
-		data[index].next = SLOT_EMPTY;
-		data[start_free].prev = SLOT_EMPTY;
+		if (index == SLOT_EMPTY)
+			throw std::runtime_error("No free items.");
+		else
+		{
+			start_free = data[index].next;
+			data[index].next = SLOT_EMPTY;
+			data[start_free].prev = SLOT_EMPTY;
+		}
 
 		return index;
-	}
-
-	int get_free()
-	{
-		return start_free;
-	}
-
-	// XXX muss weg, ist eigentlich unnoetig wenn eine freelist gepflegt wird
-	int find_free() {
-		int free = SLOT_EMPTY;
-		for (int i = 0; i < SIZE; i++) {
-			struct item *current = &data[i];
-			if (current->next == SLOT_EMPTY
-					&& current->prev == SLOT_EMPTY
-					&& i != start_data) {
-				free = i;
-				break;
-			}
-		}
-		return free;
 	}
 
 	int getLastElem() const
@@ -193,22 +228,22 @@ public:
 	void push_front(const T &param) // add a new value to the front of a list
 	{
 
-		if (start_free == SLOT_EMPTY)
+		int insert = free_pop_front();
+		if (insert == SLOT_EMPTY)
 			throw std::runtime_error("List full");
 
 		if (empty()) {
-			data[start_free].next = SLOT_EMPTY;
-			data[start_free].prev = SLOT_EMPTY;
-			data[start_free].data = param;
+			data[insert].next = SLOT_EMPTY;
+			data[insert].prev = SLOT_EMPTY;
+			data[insert].data = param;
 		} else {
-			data[start_free].next = start_data;
-			data[start_free].prev = SLOT_EMPTY;
-			data[start_free].data = param;
-			data[start_data].prev = start_free;
+			data[insert].next = start_data;
+			data[insert].prev = SLOT_EMPTY;
+			data[insert].data = param;
+			data[insert].prev = start_free;
 		}
 
-		start_data = start_free;
-		start_free = find_free();
+		start_data = insert;
 	}
 
 	void pop_front() {
@@ -220,7 +255,8 @@ public:
 		data[deleted].prev = SLOT_EMPTY;
 		data[deleted].next = SLOT_EMPTY;
 
-		start_free = deleted;
+		//start_free = deleted;
+		free_push_front(deleted);
 	}
 
 	iterator begin() const {
@@ -240,63 +276,46 @@ public:
 	// sollen constant-time benoetigen:
 	iterator insert(iterator itr, const T& value) // insert before itr
 	{
-		if (start_free < 0)
-			throw std::runtime_error("List full");
-
 		int idx = itr.getIdx();
 		assert(idx <= SIZE);
 
+		int freeIndex = free_pop_front();
+
 		struct item *current = &data[idx];
 		struct item *prev = &data[current->prev];
-		struct item *free = &data[start_free];
+		struct item *free = &data[freeIndex];
 
 		free->prev = current->prev;
 		free->next = idx;
 		free->data = value;
 
-		prev->next = start_free;
-		current->prev = start_free;
-
-		start_free = find_free();
+		prev->next = freeIndex;
+		current->prev = freeIndex;
 
 		return itr;
 	}
 
-	// XXX stop ist nicht exclusive sondern inclusive
 	iterator erase(iterator start, iterator stop) // stop exclusive
 	{
 		int start_idx = start.getIdx();
 		assert(start_idx >= 0);
 		int stop_idx = stop.getIdx();
+		int end_idx = stop.getPrevIdx();
 
 		struct item *start_item = &data[start_idx];
 		struct item *prev_to_start = &data[start_item->prev];
-		int next = start_idx;
 		start_item->prev = SLOT_EMPTY;
 
 		if (stop_idx == ITERATOR_END) {
 			prev_to_start->next = SLOT_EMPTY;
 		} else {
 			struct item *end_item = &data[stop_idx];
-			prev_to_start->next = end_item->next;
 
+			prev_to_start->next = stop_idx;
 			end_item->prev = start_item->prev;
-			end_item->next = SLOT_EMPTY;
 		}
 
-		// mark possibly new emptuy slots as such
-		struct item *current = NULL;
-		while (true) {
-			current = &data[next];
-
-			next = current->next;
-			current->next = SLOT_EMPTY;
-			current->prev = SLOT_EMPTY;
-			current->data = 0;
-
-			if (next == SLOT_EMPTY)
-				break;
-		}
+		free_push_front(start_idx, end_idx);
 		return stop;
 	}
 
