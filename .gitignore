@@ -32,3 +32,8 @@
 *.app
 
 */*.swp
+
+# Eclipse project files
+*.cproject
+*.project
+*/.settings/*
