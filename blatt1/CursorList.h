@@ -44,17 +44,17 @@ public:
 		CursorIterator(const CursorList& parent, int start_at = 0)
 		    : idx(start_at), prev_idx(ITERATOR_END), parent_data((struct item*)(&parent.data[0])) {
 			// prev_index korrekt setzen.
-			if(start_at == ITERATOR_END)
-			{
-				int next = start_data;
-				struct item* current = NULL;
-				while (next >= 0) {
-					next = &data[next];
-					prev_idx = next;
-
-					next = current->next;
-				}
-			}
+//			if(start_at == ITERATOR_END)
+//			{
+//				int next = start_data;
+//				struct item* current = NULL;
+//				while (next >= 0) {
+//					next = &data[next];
+//					prev_idx = next;
+//
+//					next = current->next;
+//				}
+//			}
 		}
 
 		int getIdx() const {
@@ -113,14 +113,6 @@ public:
 		data[0].prev = SLOT_EMPTY;
 		data[SIZE - 1].next = SLOT_EMPTY;
 
-		// initialize list with correct, empty valyes
-		/*struct item empty;
-		empty.next = SLOT_EMPTY;
-		empty.prev = SLOT_EMPTY;
-		empty.data = 0;
-		for(int i = 0; i < SIZE; i++)
-			memcpy(&data[i], &empty, sizeof(struct item));*/
-
 #ifdef DEBUG
 		printf("Initialized new List with %d elements; sizeof(data)=%ld\n",
 				SIZE, sizeof(data));
@@ -174,16 +166,16 @@ private:
 		start_free = index;
 	}
 
-/**
- * Hinzufügen einer Kette von neuen freien Elementen.
- */
+	/**
+	 * Hinzufügen einer Kette von neuen freien Elementen.
+	 */
 	void free_push_front(int startIndex, int endIndex)
 	{
 		// Fehlerhafte Eingaben abfangen.
 		if(startIndex < 0 || endIndex < 0)
 			throw std::runtime_error("Bad parameters");
 
-		//
+		// Einbinden der Kette vor dem bisher ersten Element.
 		data[endIndex].next = start_free;
 		if(start_free != SLOT_EMPTY)
 			data[start_free].prev = endIndex;
@@ -195,16 +187,17 @@ private:
 	 */
 	int free_pop_front()
 	{
+		// Fehlerhafte Eingaben abfangen.
 		int index = start_free;
 		if (index == SLOT_EMPTY)
 			throw std::runtime_error("No free items.");
-		else
-		{
-			start_free = data[index].next;
-			data[index].next = SLOT_EMPTY;
-			data[start_free].prev = SLOT_EMPTY;
-		}
 
+		// Entfernen des ersten Elements aus den freien Elementen.
+		start_free = data[index].next;
+		data[index].next = SLOT_EMPTY;
+		data[start_free].prev = SLOT_EMPTY;
+
+		// Rückgabe des zu verwendenden Index.
 		return index;
 	}
 
@@ -269,6 +262,10 @@ public:
 		return iterator(*this, iterator_start);
 	}
 
+	/**
+	 * Diese Iterator darf nicht verwendet werden,
+	 * sondern er ist nur zum erkennen des Endes zulässig.
+	 */
 	iterator end() const {
 		return iterator(*this, ITERATOR_END);
 	}
