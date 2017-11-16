@@ -170,7 +170,10 @@ void Student::read(istream& istr)
  */
 void Student::write(ostream& ostr) const
 {
-	ostr << getMatNummer() << getName() << getVorname() << getGebTag();
+	ostr << "Student: " << getMatNummer()
+		 << ", " << getName()
+		 << ", " << getVorname()
+		 << ", " << getGebTag();
 }
 
 // Stream-Operatoren
