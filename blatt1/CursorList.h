@@ -44,17 +44,17 @@ public:
 		CursorIterator(const CursorList& parent, int start_at = 0)
 		    : idx(start_at), prev_idx(ITERATOR_END), parent_data((struct item*)(&parent.data[0])) {
 			// prev_index korrekt setzen.
-//			if(start_at == ITERATOR_END)
-//			{
-//				int next = start_data;
-//				struct item* current = NULL;
-//				while (next >= 0) {
-//					next = &data[next];
-//					prev_idx = next;
-//
-//					next = current->next;
-//				}
-//			}
+			if(start_at == ITERATOR_END)
+			{
+				int next = start_data;
+				struct item* current = NULL;
+				while (next >= 0) {
+					next = &data[next];
+					prev_idx = next;
+
+					next = current->next;
+				}
+			}
 		}
 
 		int getIdx() const {
@@ -150,6 +150,7 @@ public:
 private:
 	/**
 	 * Hinzufuegen eines neuen freien Elements.
+	 * @param index Index des neuen Elements.
 	 */
 	void free_push_front(int index)
 	{
@@ -168,6 +169,8 @@ private:
 
 	/**
 	 * Hinzufügen einer Kette von neuen freien Elementen.
+	 * @param startIndex Index des ersten Elements der Kette.
+	 * @param endIndex Index des letzten Elements der Kette.
 	 */
 	void free_push_front(int startIndex, int endIndex)
 	{
@@ -184,6 +187,7 @@ private:
 
 	/**
 	 * Entfernen (belegen) eines freien Elements.
+	 * @return Index des freigegebenen Elements.
 	 */
 	int free_pop_front()
 	{
@@ -321,3 +325,25 @@ public:
 		return erase(itr, ++itr);
 	}
 };
+
+/**
+ * Suchen eines bestimmten Wertes.
+ * Wenn gefunden: Iterator zurückgeben, der auf den Wert zeigt;
+ * wenn nicht gefunden: Iterator stop zurückgeben.
+ * @param start Ab hier soll gesucht werden.
+ * @param stop Bis hier soll gesucht werden.
+ * @param value Dieser Wert soll gesucht werden.
+ * @return Verweis auf den Wert oder stop.
+ */
+template<typename Iterator, typename T>
+Iterator find(Iterator start, Iterator stop, const T& value)
+{
+	// Prüfen, ob Wert gefunden oder am Ende angelangt.
+	while((*start != value) && (start != stop))
+	{
+		// Wenn nicht: eins weiter.
+		++start;
+	}
+	// Ergebnis zurückgeben (Iterator zeigend auf gesuchtem Wert oder Stop)
+	return start;
+}
