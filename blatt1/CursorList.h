@@ -112,7 +112,6 @@ public:
 		{
 			data[i].next = i + 1;
 			data[i].prev = i - 1;
-			data[i].data = 0;
 		}
 		data[0].prev = SLOT_EMPTY;
 		data[SIZE - 1].next = SLOT_EMPTY;
@@ -382,7 +381,7 @@ public:
  * @return Verweis auf den Wert oder stop.
  */
 template<typename Iterator, typename T>
-Iterator find(Iterator start, Iterator stop, const T& value)
+Iterator cursorFind(Iterator start, Iterator stop, T& value)
 {
 	// Prüfen, ob Wert gefunden oder am Ende angelangt.
 	while((*start != value) && (start != stop))

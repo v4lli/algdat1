@@ -24,6 +24,12 @@ Student::Student()
 	Matrikelnummer = 0;
 }
 
+Student::Student(int matNr, char*, char*, char*)
+{
+	Matrikelnummer = matNr;
+	// XXX hier fehlt strCpy fuer die 3 strs
+}
+
 /**
  * Destruktor.
  * Setzt alle Attribute auf 0.
