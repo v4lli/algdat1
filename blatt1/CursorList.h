@@ -1,3 +1,10 @@
+/*
+ *
+ * Loesung Algorithmen & Datenstrukturen, WS17/18, Blatt 1
+ * Angelika Walter, Valentin Dornauer
+ *
+ */
+
 #include <iostream>     // std::cout
 #include <iterator>     // std::iterator, std::input_iterator_tag
 #include <cassert>
@@ -41,6 +48,14 @@ public:
 
 	public:
 
+		/*
+		 * The iterator remembers two values: the current index in the
+		 * physical data array from the parent class, and the physical
+		 * index of the element PRIVOUS to the element at idx.
+		 *
+		 * Upon initialization, we need to set the prev_idx field to
+		 * the physical index of the previous field. XXX
+		 */
 		CursorIterator(const CursorList& parent, int start_at = 0)
 		    : idx(start_at), prev_idx(ITERATOR_END), parent_data((struct item*)(&parent.data[0])) {
 			// prev_index korrekt setzen.
