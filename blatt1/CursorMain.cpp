@@ -44,7 +44,7 @@ int main(void) {
 	printf("insert at pos1\n");
 	lst.insert(ins, 45);
 	DUMP();
-	printf("delete element 3-4 (40,30)\n");
+	printf("delete element 3-4 (only 40 b/c exclusive)\n");
 	auto del = lst.begin();
 	del++;
 	del++;

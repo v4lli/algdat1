@@ -17,6 +17,7 @@ template <class T, unsigned int SIZE>
 class CursorList {
 private:
 	int start_data;
+	int end_data;
 	int start_free;
 
 protected:
@@ -33,14 +34,12 @@ public:
 	class CursorIterator {
 	private:
 		int idx;
-		int prev_idx;
 		struct item *parent_data;
 
 		void increment() {
 			if (idx == ITERATOR_END)
 				throw std::logic_error("Increment iterator end\n");
 
-			prev_idx = idx;
 			idx = (parent_data+getIdx())->next;
 			if (idx < 0)
 				idx = ITERATOR_END;
@@ -57,27 +56,11 @@ public:
 		 * the physical index of the previous field. XXX
 		 */
 		CursorIterator(const CursorList& parent, int start_at = 0)
-		    : idx(start_at), prev_idx(ITERATOR_END), parent_data((struct item*)(&parent.data[0])) {
-			// prev_index korrekt setzen.
-			if(start_at == ITERATOR_END)
-			{
-				int next = start_data;
-				struct item* current = NULL;
-				while (next >= 0) {
-					next = &data[next];
-					prev_idx = next;
-
-					next = current->next;
-				}
-			}
+		    : idx(start_at), parent_data((struct item*)(&parent.data[0])) {
 		}
 
 		int getIdx() const {
 			return idx;
-		}
-
-		int getPrevIdx() const{
-			return prev_idx;
 		}
 
 		const struct item *getDataPtr() const {
@@ -117,7 +100,7 @@ public:
 public:
 	typedef CursorIterator iterator;
 
-	CursorList() : start_data(SLOT_EMPTY), start_free(0) {
+	CursorList() : start_data(SLOT_EMPTY), end_data(SLOT_EMPTY), start_free(0) {
 		// initialize free-list with correct connections.
 		for(int i = 0; i < SIZE; i ++)
 		{
@@ -194,6 +177,7 @@ private:
 			throw std::runtime_error("Bad parameters");
 
 		// Einbinden der Kette vor dem bisher ersten Element.
+		data[startIndex].prev = SLOT_EMPTY;
 		data[endIndex].next = start_free;
 		if(start_free != SLOT_EMPTY)
 			data[start_free].prev = endIndex;
@@ -245,6 +229,7 @@ public:
 			throw std::runtime_error("List full");
 
 		if (empty()) {
+			end_data = insert;
 			data[insert].next = SLOT_EMPTY;
 			data[insert].prev = SLOT_EMPTY;
 			data[insert].data = param;
@@ -308,6 +293,10 @@ public:
 		prev->next = freeIndex;
 		current->prev = freeIndex;
 
+		if (itr.getIdx() == ITERATOR_END) {
+			end_data = freeIndex;
+		}
+
 		return itr;
 	}
 
@@ -316,22 +305,36 @@ public:
 		int start_idx = start.getIdx();
 		assert(start_idx >= 0);
 		int stop_idx = stop.getIdx();
-		int end_idx = stop.getPrevIdx();
 
 		struct item *start_item = &data[start_idx];
 		struct item *prev_to_start = &data[start_item->prev];
-		start_item->prev = SLOT_EMPTY;
 
 		if (stop_idx == ITERATOR_END) {
+			printf("Deleting up to last element, start_idx=%d stop_idx=%d\n", start_idx, stop_idx);
+			int delete_to = end_data;
 			prev_to_start->next = SLOT_EMPTY;
+			end_data = start_item->prev;
+			start_item->prev = SLOT_EMPTY;
+			free_push_front(start_idx, delete_to);
+
+			if (start_idx == start_data) {
+				start_data = SLOT_EMPTY;
+			}
 		} else {
 			struct item *end_item = &data[stop_idx];
+			printf("Deleting non-last element, start_idx=%d stop_idx=%d\n", start_idx, stop_idx);
+			int delete_to = end_item->prev;
 
 			prev_to_start->next = stop_idx;
 			end_item->prev = start_item->prev;
+			start_item->prev = SLOT_EMPTY;
+			free_push_front(start_idx, delete_to);
+
+			if (start_idx == start_data) {
+				start_data = stop_idx;
+			}
 		}
 
-		free_push_front(start_idx, end_idx);
 		return stop;
 	}
 
