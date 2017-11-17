@@ -36,6 +36,12 @@ public:
 		int idx;
 		struct item *parent_data;
 
+		/**
+		 * Increment the local pointer to the current physical index
+		 * inside our parent's storage array.
+		 * @throws std::logic_error in case the iterator is already
+		 *         past its end.
+		 */
 		void increment() {
 			if (idx == ITERATOR_END)
 				throw std::logic_error("Increment iterator end\n");
@@ -117,8 +123,11 @@ public:
 #endif
 	}
 
-	typedef T value_type; // XXX unused
-
+	/**
+	 * Check whether the list is empty or not
+	 *
+	 * @return true/false if the list is empty
+	 */
 	bool empty() const {
 		if (start_data == SLOT_EMPTY)
 			return true;
@@ -126,6 +135,11 @@ public:
 			return false;
 	}
 
+	/**
+	 * Returns the number of elements actually stored inside the list
+	 *
+	 * @return Number of elements.
+	 */
 	int size() const {
 		if (start_data == SLOT_EMPTY)
 			return 0;
@@ -141,6 +155,11 @@ public:
 		return counter;
 	}
 
+	/**
+	 * Returns the first element of the list.
+	 *
+	 * Undefined behaviour is list empty.
+	 */
 	T& front() {
 		return data[start_data].data;
 	}
@@ -204,23 +223,12 @@ private:
 		return index;
 	}
 
-	int getLastElem() const
-	{
-		if (start_data == SLOT_EMPTY)
-			return 0;
-
-		const struct item *current = &data[start_data];
-		int last = 0;
-		while (current->next != SLOT_EMPTY) {
-			last = current->next;
-			assert(current->next <= SIZE);
-			current = &data[current->next];
-		}
-
-		return last;
-	}
-
 public:
+	/**
+	 * Add an element to the front of the list
+	 *
+	 * @param param Element to add
+	 */
 	void push_front(const T &param) // add a new value to the front of a list
 	{
 
@@ -243,6 +251,9 @@ public:
 		start_data = insert;
 	}
 
+	/**
+	 * Remove the first element from the list
+	 */
 	void pop_front() {
 		int deleted = start_data;
 
@@ -252,10 +263,12 @@ public:
 		data[deleted].prev = SLOT_EMPTY;
 		data[deleted].next = SLOT_EMPTY;
 
-		//start_free = deleted;
 		free_push_front(deleted);
 	}
 
+	/*
+	 * Return an iterator pointing to the first element in the list
+	 */
 	iterator begin() const {
 		int iterator_start;
 		if (start_data == SLOT_EMPTY)
@@ -267,13 +280,18 @@ public:
 	}
 
 	/**
-	 * Diese Iterator darf nicht verwendet werden,
-	 * sondern er ist nur zum erkennen des Endes zulässig.
+	 * Diese Iterator darf nicht dereferenziert werden,
+	 * sondern er ist nur zum erkennen des Endes zulässig (getIdx() bzw != ==)
 	 */
 	iterator end() const {
 		return iterator(*this, ITERATOR_END);
 	}
 
+	/**
+	 * Insert elemente value before itr
+	 *
+	 * @return Unchanged itr
+	 */
 	// sollen constant-time benoetigen:
 	iterator insert(iterator itr, const T& value) // insert before itr
 	{
@@ -300,6 +318,12 @@ public:
 		return itr;
 	}
 
+	/**
+	 * Erase elements starting at start until stop - 1 (i.e. stop is not
+	 * removed and may be the end() iterator)
+	 *
+	 * @return stop itr (unchanged)
+	 */
 	iterator erase(iterator start, iterator stop) // stop exclusive
 	{
 		int start_idx = start.getIdx();
@@ -338,6 +362,10 @@ public:
 		return stop;
 	}
 
+	/** Remove element pointed to by itr
+	 *
+	 * @return itr + 1
+	 */
 	iterator erase(iterator itr) // return ++itr
 	{
 		return erase(itr, ++itr);
