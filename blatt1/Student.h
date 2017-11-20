@@ -16,7 +16,7 @@ public:
 	// Konstruktor und Destruktor
 	Student();
 	Student(int, char*, char*, char*);
-	Student(Student);
+	Student(const Student&);
 	virtual ~Student();
 	// Getter
 	int getMatNummer() const;

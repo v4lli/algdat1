@@ -40,7 +40,7 @@ Student::Student(int matNr, char* name, char* vorname, char*gebTag)
  * Copy-Konstruktor.
  * Kopiert die Werte vom anderen Student.
  */
-Student::Student(Student from)
+Student::Student(const Student &from)
 {
 	Matrikelnummer = from.getMatNummer();
 	strncpy(Name, from.getName(), 10);
