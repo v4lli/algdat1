@@ -13,7 +13,7 @@ CursorList<Student, 128> liste = CursorList<Student, 128>();
 
 void enterStudent()
 {
-	printf("Wie viele Studenten wollen sie eingeben? (Maximal 10)\n");
+	printf("Wie viele Studenten wollen sie eingeben?\n");
 
 	// Anzahl einlesen.
 	int num = 0;
@@ -38,7 +38,7 @@ void searchStudent()
 	cin >> suchNr;
 	// Suchen.
 	Student such = Student(suchNr, NULL, NULL, NULL);
-	CursorList<Student, 128>::CursorIterator erg = cursorFind(liste.begin(), liste.end(), such);
+	auto erg = cursorFind(liste.begin(), liste.end(), such);
 	// Ergebnis ausgeben.
 	(*erg).write(cout << "Gefunden: ");
 }

@@ -24,10 +24,28 @@ Student::Student()
 	Matrikelnummer = 0;
 }
 
-Student::Student(int matNr, char*, char*, char*)
+/**
+ * Voller Eingabe-Konstruktor.
+ * Kopiert die eingegebenen Werte.
+ */
+Student::Student(int matNr, char* name, char* vorname, char*gebTag)
 {
 	Matrikelnummer = matNr;
-	// XXX hier fehlt strCpy fuer die 3 strs
+	strncpy(Name, name, 10);
+	strncpy(Vorname, vorname, 10);
+	strncpy(Geburtstag, gebTag, 9);
+}
+
+/**
+ * Copy-Konstruktor.
+ * Kopiert die Werte vom anderen Student.
+ */
+Student::Student(Student from)
+{
+	Matrikelnummer = from.getMatNummer();
+	strncpy(Name, from.getName(), 10);
+	strncpy(Vorname, from.getVorname(), 10);
+	strncpy(Geburtstag, from.getGebTag(), 9);
 }
 
 /**
