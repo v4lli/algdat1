@@ -56,13 +56,17 @@ public:
 		/*
 		 * The iterator remembers two values: the current index in the
 		 * physical data array from the parent class, and the physical
-		 * index of the element PRIVOUS to the element at idx.
+		 * index of the element PREVIOUS to the element at idx.
 		 *
 		 * Upon initialization, we need to set the prev_idx field to
 		 * the physical index of the previous field. XXX
 		 */
 		CursorIterator(const CursorList& parent, int start_at = 0)
 		    : idx(start_at), parent_data((struct item*)(&parent.data[0])) {
+			if(start_at < 0)
+			{
+				// XXX index previous to end suchen.
+			}
 		}
 
 		int getIdx() const {
@@ -184,7 +188,7 @@ private:
 	}
 
 	/**
-	 * Hinzufügen einer Kette von neuen freien Elementen.
+	 * Hinzufuegen einer Kette von neuen freien Elementen.
 	 * @param startIndex Index des ersten Elements der Kette.
 	 * @param endIndex Index des letzten Elements der Kette.
 	 */
