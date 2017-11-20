@@ -31,9 +31,12 @@ Student::Student()
 Student::Student(int matNr, char* name, char* vorname, char*gebTag)
 {
 	Matrikelnummer = matNr;
-	strncpy(Name, name, 10);
-	strncpy(Vorname, vorname, 10);
-	strncpy(Geburtstag, gebTag, 9);
+	if (name != NULL)
+		strncpy(Name, name, 10);
+	if (vorname != NULL)
+		strncpy(Vorname, vorname, 10);
+	if (gebTag != NULL)
+		strncpy(Geburtstag, gebTag, 9);
 }
 
 /**

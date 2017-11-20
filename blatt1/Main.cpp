@@ -40,7 +40,9 @@ void searchStudent()
 	Student such = Student(suchNr, NULL, NULL, NULL);
 	auto erg = cursorFind(liste.begin(), liste.end(), such);
 	// Ergebnis ausgeben.
-	(*erg).write(cout << "Gefunden: ");
+	cout << "-----------------\n";
+	(*erg).write(cout << "Gefunden:\n");
+	cout << "\n-----------------\n";
 }
 
 int main(void)
