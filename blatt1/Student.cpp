@@ -199,15 +199,15 @@ void Student::write(ostream& ostr) const
 		 << ", " << getVorname()
 		 << ", " << getGebTag();
 }
-
 // Stream-Operatoren
-ostream& operator << (ostream& ostr, const Student& stud)
+ostream& operator<< (ostream& ostr, const Student& stud)
 {
 	cout << "Hier";
 	stud.write(ostr);
 	return ostr;
 }
-istream& operator >> (istream& istr, Student& stud)
+
+istream& operator>> (istream& istr, Student& stud)
 {
 	stud.read(istr);
 	return istr;

@@ -38,10 +38,9 @@ public:
 	// Read und Write
 	virtual void write(ostream& ostr) const;
 	virtual void read(istream& istr);
-
 };
 
-inline ostream& operator << (ostream& ostr, const Student& stud);
-inline istream& operator >> (istream& istr, Student& stud);
+ostream& operator << (ostream& ostr, const Student& stud);
+istream& operator >> (istream& istr, Student& stud);
 
 #endif /* STUDENT_H_ */

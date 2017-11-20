@@ -6,8 +6,8 @@ cursor:
 	$(CC) -g -o cursormain CursorMain.o -o cursormain
 
 main:
-	$(CC) -g -std=c++11 Main.cpp -o blatt1
-	./blatt 1
+	$(CC) -g -std=c++11 Student.cpp Main.cpp -o blatt1
+	./blatt1
 
 clean:
 	rm -f cursormain *.o
