@@ -19,10 +19,7 @@ char Geburtstag[9];
  * Konstruktor.
  * Setzt alle Attribute auf 0;
  */
-Student::Student()
-{
-	Matrikelnummer = 0;
-}
+Student::Student() { }
 
 /**
  * Voller Eingabe-Konstruktor.
@@ -55,10 +52,7 @@ Student::Student(const Student &from)
  * Destruktor.
  * Setzt alle Attribute auf 0.
  */
-Student::~Student()
-{
-	Matrikelnummer = 0;
-}
+Student::~Student() {}
 
 /**
  * Getter fuer die Matrikelnummer.
@@ -205,7 +199,6 @@ void Student::write(ostream& ostr) const
 // Stream-Operatoren
 ostream& operator<< (ostream& ostr, const Student& stud)
 {
-	cout << "Hier";
 	stud.write(ostr);
 	return ostr;
 }
