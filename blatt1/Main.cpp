@@ -32,6 +32,11 @@ void enterStudent()
 
 void searchStudent()
 {
+	if(liste.size() <= 0)
+	{
+		printf("In einer leeren Liste kann nicht gesucht werden.");
+		return;
+	}
 	printf("Nach welcher Matrikelnummer wollen Sie suchen?\n");
 	// Matrikelnummer einlesen.
 	int suchNr = 0;
@@ -45,6 +50,40 @@ void searchStudent()
 	cout << "\n-----------------\n";
 }
 
+void deleteStudent()
+{
+	if(liste.size() <= 0)
+	{
+		printf("Kein Studnet vorhanden.");
+		return;
+	}
+	printf("Welchen Studenten (Matrikelnummer) wollen Sie löschen?\n");
+	// Matrikelnummer einlesen.
+	int suchNr = 0;
+	cin >> suchNr;
+	// Suchen.
+	Student such = Student(suchNr, NULL, NULL, NULL);
+	auto erg = cursorFind(liste.begin(), liste.end(), such);
+	// Student löschen.
+	liste.erase(erg);
+}
+
+void alleAusgeben()
+{
+	if(liste.size() <= 0)
+	{
+		printf("Keine Studenten in der Liste.");
+		return;
+	}
+	auto iterator = liste.begin();
+	while(iterator != liste.end())
+	{
+		(*iterator).write(cout);
+		cout << "\n";
+		++iterator;
+	}
+}
+
 int main(void)
 {
 	bool run = true;
@@ -54,7 +93,9 @@ int main(void)
 		printf("Was wollen Sie tun?\n");
 		printf("e -> Eingabe von Studenten\n");
 		printf("s -> Suche nach Student\n");
+		printf("l -> Einen Studenten löschen\n");
 		printf("c -> Alle Studenten aus der Liste loeschen\n");
+		printf("a -> Alle Studenten aus der Liste ausgeben\n");
 		printf("q -> Programm beenden\n");
 
 		// Eingabe lesen.
@@ -70,9 +111,17 @@ int main(void)
 			case 'S':
 				searchStudent();
 				break;
+			case 'l':
+			case 'L':
+				deleteStudent();
+				break;
 			case 'c':	// Liste leeren.
 			case 'C':
 				liste = CursorList<Student, 128>();
+				break;
+			case 'a':
+			case 'A':
+				alleAusgeben();
 				break;
 			case 'q':	// Programm beenden.
 			case 'Q':
