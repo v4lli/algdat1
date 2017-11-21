@@ -55,18 +55,10 @@ public:
 
 		/*
 		 * The iterator remembers two values: the current index in the
-		 * physical data array from the parent class, and the physical
-		 * index of the element PREVIOUS to the element at idx.
-		 *
-		 * Upon initialization, we need to set the prev_idx field to
-		 * the physical index of the previous field. XXX
+		 * physical data array from the parent class.
 		 */
 		CursorIterator(const CursorList& parent, int start_at = 0)
 		    : idx(start_at), parent_data((struct item*)(&parent.data[0])) {
-			if(start_at < 0)
-			{
-				// XXX index previous to end suchen.
-			}
 		}
 
 		int getIdx() const {
@@ -337,7 +329,10 @@ public:
 		struct item *prev_to_start = &data[start_item->prev];
 
 		if (stop_idx == ITERATOR_END) {
-			printf("Deleting up to last element, start_idx=%d stop_idx=%d\n", start_idx, stop_idx);
+#ifdef DEBUG
+			printf("Deleting up to last element, start_idx=%d "
+			    "stop_idx=%d\n", start_idx, stop_idx);
+#endif
 			int delete_to = end_data;
 			prev_to_start->next = SLOT_EMPTY;
 			end_data = start_item->prev;
@@ -349,7 +344,10 @@ public:
 			}
 		} else {
 			struct item *end_item = &data[stop_idx];
-			printf("Deleting non-last element, start_idx=%d stop_idx=%d\n", start_idx, stop_idx);
+#ifdef DEBUG
+			printf("Deleting non-last element, start_idx=%d "
+			    "stop_idx=%d\n", start_idx, stop_idx);
+#endif
 			int delete_to = end_item->prev;
 
 			prev_to_start->next = stop_idx;
