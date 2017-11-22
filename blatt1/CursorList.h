@@ -258,7 +258,7 @@ public:
 			data[insert].next = start_data;
 			data[insert].prev = SLOT_EMPTY;
 			data[insert].data = param;
-			data[insert].prev = start_free;
+			data[start_data].prev = insert;
 		}
 
 		start_data = insert;
@@ -391,10 +391,27 @@ public:
 		++itr;
 		assert(start_idx >= 0);
 		struct item *start_item = &data[start_idx];
-		struct item *prev_to_start = &data[start_item->prev];
-		struct item *after_start = &data[start_item->next];
-		prev_to_start->next = start_item->next;
-		after_start->prev = start_item->prev;
+		printf("0: next=%d, prev=%d\n", start_item->next, start_item->prev);
+		if(start_item->next >= 0)
+		{
+			printf("A: next=%d, prev=%d\n", start_item->next, start_item->prev);
+			struct item *after_start = &data[start_item->next];
+			after_start->prev = start_item->prev;
+		}
+		else
+		{
+			end_data = start_item->prev;
+		}
+		if(start_item->prev >= 0)
+		{
+			printf("B: next=%d, prev=%d\n", start_item->next, start_item->prev);
+			struct item *prev_to_start = &data[start_item->prev];
+			prev_to_start->next = start_item->next;
+		}
+		else
+		{
+			start_data = start_item->next;
+		}
 
 		free_push_front(start_idx);
 		return itr;
