@@ -6,7 +6,7 @@ cursor:
 	$(CC) -g -o cursormain CursorMain.o -o cursormain
 
 main:
-	$(CC) -g -std=c++11 Student.cpp Main.cpp -o blatt1
+	$(CC) -g -std=c++11 -DDEBUG=true Student.cpp Main.cpp -o blatt1
 	./blatt1
 
 clean:

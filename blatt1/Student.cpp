@@ -10,24 +10,22 @@
 #include <cstring>
 using namespace std;
 
-int Matrikelnummer;
-char Name[10];
-char Vorname[10];
-char Geburtstag[9];
-
 /**
  * Konstruktor.
  * Setzt alle Attribute auf 0;
  */
-Student::Student() { }
+Student::Student() {
+#ifdef DEBUG
+	printf("DEBUG: Empty constructor called\n");
+#endif
+}
 
 /**
  * Voller Eingabe-Konstruktor.
  * Kopiert die eingegebenen Werte.
  */
-Student::Student(int matNr, char* name, char* vorname, char*gebTag)
+Student::Student(int matNr, char* name, char* vorname, char*gebTag) : Matrikelnummer(matNr)
 {
-	Matrikelnummer = matNr;
 	if (name != NULL)
 		strncpy(Name, name, 10);
 	if (vorname != NULL)
@@ -42,10 +40,14 @@ Student::Student(int matNr, char* name, char* vorname, char*gebTag)
  */
 Student::Student(const Student &from)
 {
-	Matrikelnummer = from.getMatNummer();
-	strncpy(Name, from.getName(), 10);
-	strncpy(Vorname, from.getVorname(), 10);
-	strncpy(Geburtstag, from.getGebTag(), 9);
+	Student s = (Student)from;
+#ifdef DEBUG
+	printf("DEBUG: CopyConstructor called\n");
+#endif
+	Matrikelnummer = s.getMatNummer();
+	strncpy(Name, s.getName(), 10);
+	strncpy(Vorname, s.getVorname(), 10);
+	strncpy(Geburtstag, s.getGebTag(), 9);
 }
 
 /**
@@ -57,7 +59,7 @@ Student::~Student() {}
 /**
  * Getter fuer die Matrikelnummer.
  */
-int Student::getMatNummer() const
+int Student::getMatNummer()
 {
 	return Matrikelnummer;
 }
@@ -73,7 +75,7 @@ void Student::setMatNummer(int neuMatNum)
 /**
  * Getter fuer den Namen.
  */
-char* Student::getName() const
+char* Student::getName()
 {
 	return Name;
 }
@@ -92,7 +94,7 @@ void Student::setName(char neuName[])
 /**
  * Getter fuer den Vornamen.
  */
-char* Student::getVorname() const
+char* Student::getVorname()
 {
 	return Vorname;
 }
@@ -111,7 +113,7 @@ void Student::setVorname(char neuVorname[])
 /**
  * Getter fuer den Geburtstag.
  */
-char* Student::getGebTag() const
+char* Student::getGebTag()
 {
 	return Geburtstag;
 }
@@ -189,7 +191,7 @@ void Student::read(istream& istr)
 /**
  * Schreibt auf einen ausgehenden Stream alle Attribute.
  */
-void Student::write(ostream& ostr) const
+void Student::write(ostream& ostr)
 {
 	ostr << "Student: " << getMatNummer()
 		 << ", " << getName()
@@ -199,7 +201,7 @@ void Student::write(ostream& ostr) const
 // Stream-Operatoren
 ostream& operator<< (ostream& ostr, const Student& stud)
 {
-	stud.write(ostr);
+	((Student)stud).write(ostr);
 	return ostr;
 }
 

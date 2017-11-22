@@ -57,7 +57,7 @@ void deleteStudent()
 		printf("Kein Studnet vorhanden.");
 		return;
 	}
-	printf("Welchen Studenten (Matrikelnummer) wollen Sie löschen?\n");
+	printf("Welchen Studenten (Matrikelnummer) wollen Sie loeschen?\n");
 	// Matrikelnummer einlesen.
 	int suchNr = 0;
 	cin >> suchNr;
@@ -93,7 +93,7 @@ int main(void)
 		printf("Was wollen Sie tun?\n");
 		printf("e -> Eingabe von Studenten\n");
 		printf("s -> Suche nach Student\n");
-		printf("l -> Einen Studenten löschen\n");
+		printf("l -> Einen Studenten loeschen\n");
 		printf("c -> Alle Studenten aus der Liste loeschen\n");
 		printf("a -> Alle Studenten aus der Liste ausgeben\n");
 		printf("q -> Programm beenden\n");
@@ -118,10 +118,12 @@ int main(void)
 			case 'c':	// Liste leeren.
 			case 'C':
 				liste = CursorList<Student, 128>();
+				liste.dump();
 				break;
 			case 'a':
 			case 'A':
 				alleAusgeben();
+				liste.dump();
 				break;
 			case 'q':	// Programm beenden.
 			case 'Q':

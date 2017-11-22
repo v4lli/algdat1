@@ -12,6 +12,11 @@
 using namespace std;
 
 class Student {
+private:
+	int Matrikelnummer;
+	char Name[10];
+	char Vorname[10];
+	char Geburtstag[9];
 public:
 	// Konstruktor und Destruktor
 	Student();
@@ -19,10 +24,10 @@ public:
 	Student(const Student&);
 	virtual ~Student();
 	// Getter
-	int getMatNummer() const;
-	char* getName() const;
-	char* getVorname() const;
-	char* getGebTag() const;
+	int getMatNummer();
+	char* getName();
+	char* getVorname();
+	char* getGebTag();
 	// Setter
 	void setMatNummer(int);
 	void setName(char*);
@@ -36,7 +41,7 @@ public:
 	bool operator>(Student &s2);
 	bool operator<(Student &s2);
 	// Read und Write
-	virtual void write(ostream& ostr) const;
+	virtual void write(ostream& ostr);
 	virtual void read(istream& istr);
 };
 
