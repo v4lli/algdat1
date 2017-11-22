@@ -118,12 +118,16 @@ int main(void)
 			case 'c':	// Liste leeren.
 			case 'C':
 				liste = CursorList<Student, 128>();
+#ifdef DEBUG
 				liste.dump();
+#endif
 				break;
 			case 'a':
 			case 'A':
 				alleAusgeben();
+#ifdef DEBUG
 				liste.dump();
+#endif
 				break;
 			case 'q':	// Programm beenden.
 			case 'Q':
