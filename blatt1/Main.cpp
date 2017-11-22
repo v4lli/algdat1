@@ -34,7 +34,7 @@ void searchStudent()
 {
 	if(liste.size() <= 0)
 	{
-		printf("In einer leeren Liste kann nicht gesucht werden.");
+		printf("In einer leeren Liste kann nicht gesucht werden.\n");
 		return;
 	}
 	printf("Nach welcher Matrikelnummer wollen Sie suchen?\n");
@@ -54,7 +54,7 @@ void deleteStudent()
 {
 	if(liste.size() <= 0)
 	{
-		printf("Kein Studnet vorhanden.");
+		printf("Kein Student vorhanden\n");
 		return;
 	}
 	printf("Welchen Studenten (Matrikelnummer) wollen Sie loeschen?\n");
@@ -72,7 +72,7 @@ void alleAusgeben()
 {
 	if(liste.size() <= 0)
 	{
-		printf("Keine Studenten in der Liste.");
+		printf("Keine Studenten in der Liste.\n");
 		return;
 	}
 	auto iterator = liste.begin();

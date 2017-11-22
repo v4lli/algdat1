@@ -387,7 +387,20 @@ public:
 	 */
 	iterator erase(iterator itr) // return ++itr
 	{
-		return erase(itr, ++itr);
+		int start_idx = itr.getIdx();
+		++itr;
+		assert(start_idx >= 0);
+		struct item *start_item = &data[start_idx];
+		struct item *prev_to_start = &data[start_item->prev];
+		struct item *after_start = &data[start_item->next];
+		prev_to_start->next = start_item->next;
+		after_start->prev = start_item->prev;
+
+		free_push_front(start_idx);
+		return itr;
+
+		// Originaler Aufruf; So war der Iterator verschoben und Start = Stop.
+		//return erase(itr, ++itr);
 	}
 };
 
