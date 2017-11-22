@@ -1,4 +1,4 @@
-/*
+/* CursorList.h
  *
  * Loesung Algorithmen & Datenstrukturen, WS17/18, Blatt 1
  * Angelika Walter, Valentin Dornauer

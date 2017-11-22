@@ -1,11 +1,3 @@
-/*
- * StudentMain.cpp
- *
- *  Created on: 25.10.2017
- *      Author: Angelika
- */
-
-#include "StudnetMain.h";
 #include "Student.h";
 #include <cstdio>;
 #include <iostream>;

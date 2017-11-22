@@ -1,9 +1,10 @@
-/*
- * Main.cpp
+/* Main.cpp
  *
- *  Created on: 16.11.2017
- *      Author: Angelika
+ * Loesung Algorithmen & Datenstrukturen, WS17/18, Blatt 1
+ * Angelika Walter, Valentin Dornauer
+ *
  */
+
 #include <cstdio>
 #include "CursorList.h"
 #include "Student.h"
@@ -18,7 +19,7 @@ void enterStudent()
 	// Anzahl einlesen.
 	int num = 0;
 	cin >> num;
-	for(int i = 0; i < num && i < 10; i ++)
+	for(int i = 0; i < num; i ++)
 	{
 		// Jeden Studenten einlesen.
 		printf("Studentendaten eingeben in der Form:\n");
@@ -32,7 +33,7 @@ void enterStudent()
 
 void searchStudent()
 {
-	if(liste.size() <= 0)
+	if(liste.empty())
 	{
 		printf("In einer leeren Liste kann nicht gesucht werden.\n");
 		return;
@@ -52,7 +53,7 @@ void searchStudent()
 
 void deleteStudent()
 {
-	if(liste.size() <= 0)
+	if(liste.empty())
 	{
 		printf("Kein Student vorhanden\n");
 		return;
@@ -70,7 +71,7 @@ void deleteStudent()
 
 void alleAusgeben()
 {
-	if(liste.size() <= 0)
+	if(liste.empty())
 	{
 		printf("Keine Studenten in der Liste.\n");
 		return;
@@ -111,7 +112,7 @@ int main(void)
 			case 'S':
 				searchStudent();
 				break;
-			case 'l':
+			case 'l':	// Einen Studenten löschen.
 			case 'L':
 				deleteStudent();
 				break;
@@ -122,7 +123,7 @@ int main(void)
 				liste.dump();
 #endif
 				break;
-			case 'a':
+			case 'a':	// Alle Studenten ausgeben.
 			case 'A':
 				alleAusgeben();
 #ifdef DEBUG

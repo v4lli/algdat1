@@ -1,8 +1,8 @@
-/*
- * Student.h
+/* Student.h
  *
- *  Created on: 11.10.2017
- *      Author: Angelika
+ * Loesung Algorithmen & Datenstrukturen, WS17/18, Blatt 1
+ * Angelika Walter, Valentin Dornauer
+ *
  */
 
 #ifndef STUDENT_H_
@@ -13,6 +13,7 @@ using namespace std;
 
 class Student {
 private:
+	// Objektvariablen
 	int Matrikelnummer;
 	char Name[10];
 	char Vorname[10];

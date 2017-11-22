@@ -1,8 +1,8 @@
-/*
- * Student.cpp
+/* Student.cpp
  *
- *  Created on: 11.10.2017
- *      Author: Angelika
+ * Loesung Algorithmen & Datenstrukturen, WS17/18, Blatt 1
+ * Angelika Walter, Valentin Dornauer
+ *
  */
 
 #include "Student.h"
@@ -12,7 +12,6 @@ using namespace std;
 
 /**
  * Konstruktor.
- * Setzt alle Attribute auf 0;
  */
 Student::Student() {
 #ifdef DEBUG
@@ -52,7 +51,6 @@ Student::Student(const Student &from)
 
 /**
  * Destruktor.
- * Setzt alle Attribute auf 0.
  */
 Student::~Student() {}
 
