@@ -150,6 +150,24 @@ public:
 		return counter;
 	}
 
+	void dump() const {
+		if (start_data == SLOT_EMPTY) {
+			printf("DUMP: List empty");
+			return;
+		}
+
+		printf("DUMP: start_data=%d\n", start_data);
+
+		int idx = start_data;
+		const struct item *current = &data[idx];
+		while (current->next != SLOT_EMPTY) {
+			printf("DUMP: data[%d].prev=%d data[%d].next=%d\n", idx, current->prev, idx, current->next);
+			assert(current->next <= SIZE);
+			current = &data[current->next];
+			idx = current->next;
+		}
+	}
+
 	/**
 	 * Returns the first element of the list.
 	 *
