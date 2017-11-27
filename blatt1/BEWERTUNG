@@ -1,0 +1,24 @@
+100/100:
+
+Akzeptiert
+
+Guter Umgang mit C++, bei der zweiten Aufgabe bitte eine Lösung anbieten, die die vollständige Funktionalität testen lässt (Testfälle für insert, erase(start,stop)? )
+
+CursorList.h:80 			return new CursorIterator(rhs.getDataPtr(), rhs.getIdx());
+ACHTUNG: Hier entsteht ein Speicherloch! Sie legen ein Objekt auf dem Heap an (new), das nie wieder entfernt wird! Bitte hier kein new verwenden!
+
+CursorList.h:96	CursorIterator operator++ (int) { // postfix increment operator
+Identisch zu pre-increment implementiert, aber die Semantik von post-increment ist anders!    (z.B. CursorIterator clone(*this); increment(); return clone;   )
+
+CursorList.h:126  Klassisches Optimierungs-Muster
+if (start_data == SLOT_EMPTY)
+			return true;
+		else
+			return false;
+==>  return (start_data == SLOT_EMPTY)
+
+CursorList.h:288: Bei identischer Codierung von SLOT_EMPTY und ITERATOR_END entstünde einfacherer Code
+
+CursorList.h:340 - 422 Doppelten Code vermeiden, z.B. erase(iterator it) auf erase(iterator it, it++) abstützen
+
+StudentMain.cpp (wahrscheinlich eine "Altlast"): Präprozessor-Statements nicht mit ; abschließen!
