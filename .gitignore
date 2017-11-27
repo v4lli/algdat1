@@ -37,3 +37,5 @@
 *.cproject
 *.project
 */.settings/*
+
+*.DS_Store
