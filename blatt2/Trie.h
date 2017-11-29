@@ -9,29 +9,68 @@
 #define TRIE_H_
 
 #include <string>
-#include <cstring>
+#include <map>
 using namespace std;
 
 template <class T, class E=char>
 class Trie
 {
+	class Node
+	{
+	public:
+		virtual Node(E my_id): id(my_id) { };
+		virtual ~Node();
+		virtual void print(int depth) = 0;
+		E getId(){return id;};
+	protected:
+		E id;
+	};
+
+	class Leaf : public Node
+	{
+	public:
+		void print(int depth){
+			printf("%*s", depth * 2, "");
+			// XXX Wert mit ausgeben...
+			printf(value + "\n");
+		};
+	private:
+		T value;
+	};
+
+	class InnerNode : public Node
+	{
+	public:
+		void print(int depth){
+			printf("%*s", depth * 2, "");
+			printf("%c:\n", getId());
+			for(auto itr = children.begin(); itr != children.end(); ++itr)
+			{
+				(*itr).print(depth + 1);
+			}
+		};
+		void attach(Node* child)
+		{
+			children.insert(make_pair(child->id, child));
+		};
+	private:
+		map<E, Node*> children;		// evtl. auch austauschen in Sortierte Liste.
+	};
+
 public:
 	typedef basic_string<E> key_type;	// string=basic_string<char>
 	typedef pair<const key_type, T> value_type;
 	typedef T mapped_type;
-	typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln…
+	//typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln…
 	bool empty() const;
 	iterator insert(const value_type& value);
 	void erase(const key_type& value);
 	void clear(); // erase all
-	iterator lower_bound(const key_type& testElement);	// first element >= testElement
-	iterator upper_bound(const key_type& testElement);	// first element > testElement
-	iterator find(const key_type& testElement);			// first element == testElement
-	iterator begin();									// returns end() if not found
-	iterator end();
-	//typedef std::reverse_iterator<iterator> reverse_iterator;
-	//reverse_iterator rbegin();						//wenn Sie Lust und Zeit haben…
-	//reverse_iterator rend();							//wenn Sie Lust und Zeit haben…
+//	iterator lower_bound(const key_type& testElement);	// first element >= testElement
+//	iterator upper_bound(const key_type& testElement);	// first element > testElement
+//	iterator find(const key_type& testElement);			// first element == testElement
+//	iterator begin();									// returns end() if not found
+//	iterator end();
 };
 
 #endif /* TRIE_H_ */
