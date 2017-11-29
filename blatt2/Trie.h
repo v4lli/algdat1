@@ -18,8 +18,8 @@ class Trie
 	class Node
 	{
 	public:
-		virtual Node(E my_id): id(my_id) { };
-		virtual ~Node();
+		Node(E my_id): id(my_id) { };
+		~Node();
 		virtual void print(int depth) = 0;
 		E getId(){return id;};
 	protected:
@@ -43,7 +43,7 @@ class Trie
 	public:
 		void print(int depth){
 			printf("%*s", depth * 2, "");
-			printf("%c:\n", getId());
+			printf("%c:\n", id);
 			for(auto itr = children.begin(); itr != children.end(); ++itr)
 			{
 				(*itr).print(depth + 1);
@@ -63,7 +63,7 @@ public:
 	typedef T mapped_type;
 	//typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln…
 	bool empty() const;
-	iterator insert(const value_type& value);
+	//iterator insert(const value_type& value);
 	void erase(const key_type& value);
 	void clear(); // erase all
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
