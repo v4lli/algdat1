@@ -41,9 +41,10 @@ class Trie
 	class InnerNode : public Node
 	{
 	public:
+		InnerNode(E my_id) : Node(my_id) {};
 		void print(int depth){
 			printf("%*s", depth * 2, "");
-			printf("%c:\n", id);
+			printf("%c:\n", Node::id);
 			for(auto itr = children.begin(); itr != children.end(); ++itr)
 			{
 				(*itr).print(depth + 1);
@@ -64,6 +65,8 @@ public:
 	//typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln…
 	bool empty() const;
 	//iterator insert(const value_type& value);
+	//XXX muss iterator returnen
+	void insert(const value_type& value);
 	void erase(const key_type& value);
 	void clear(); // erase all
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
@@ -71,6 +74,13 @@ public:
 //	iterator find(const key_type& testElement);			// first element == testElement
 //	iterator begin();									// returns end() if not found
 //	iterator end();
+
+private:
+	InnerNode rootNode = InnerNode(0);
+
+public:
+	Trie() {};
+
 };
 
 #endif /* TRIE_H_ */
