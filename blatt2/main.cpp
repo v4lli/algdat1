@@ -2,10 +2,10 @@
 #include "Trie.h"
 
 int main(void) {
-	auto t = Trie<char*>();
+	auto t = Trie<string>();
 
 	printf("t.empty()=%d\n", t.empty());
 
-	t.insert(std::make_pair("kuh", "muh"));
+	t.insert(std::make_pair(string("kuh"), string("muh")));
 	return 0;
 }
