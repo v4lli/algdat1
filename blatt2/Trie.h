@@ -137,7 +137,7 @@ public:
 	};
 	void print()
 	{
-		root_node.print();
+		root_node.print(0);
 	};
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
 //	iterator upper_bound(const key_type& testElement);	// first element > testElement

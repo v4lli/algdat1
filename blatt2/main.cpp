@@ -8,5 +8,6 @@ int main(void) {
 
 
 	t.insert(std::make_pair(string("kuh"), string("muh")));
+	t.print();
 	return 0;
 }
