@@ -24,6 +24,7 @@ class Trie
 		~Node() {};
 		virtual void print(int depth) = 0;
 		E getId(){return id;};
+		virtual void clear() = 0;
 	protected:
 		E id;
 	};
@@ -43,6 +44,11 @@ class Trie
 		T&  get() {
 			return value;
 		}
+		void clear()
+		{
+			// XXX evtl. value löschen.
+			delete value;
+		};
 	private:
 		T value;
 	};
@@ -51,6 +57,7 @@ class Trie
 	{
 	public:
 		InnerNode(E my_id) : Node(my_id) {};
+		// XXX: Destruktoren klären.
 		~InnerNode() {};
 		void print(int depth){
 			printf("%*s", depth * 2, "");
@@ -60,10 +67,26 @@ class Trie
 				(*(*itr).second).print(depth + 1);
 			}
 		};
+
+		void clear()
+		{
+			if(has_children())
+			{
+				for(auto itr = children.begin(); itr != children.end();)
+				{
+					(*itr).second->clear();
+					children.erase(itr);
+				}
+			}
+			// XXX Evtl. map noch löschen.
+			//delete children;
+		};
+
 		void attach(Leaf* child)
 		{
 			children.insert(make_pair(TERMINAL, child));
 		};
+
 		// Returns a pointer to a node (and possibly creates it)
 		Node& get_reference_or_create(E part) {
 			if (!children.count(part)) {
@@ -71,6 +94,11 @@ class Trie
 			}
 			return *(children[part]);
 		}
+
+		bool has_children() const
+		{
+			return !children.empty();
+		};
 	private:
 		map<E, Node*> children;		// evtl. auch austauschen in Sortierte Liste.
 	};
@@ -81,7 +109,10 @@ public:
 	typedef pair<const key_type, T> value_type;
 	typedef T mapped_type;
 	//typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln…
-	bool empty() const;
+	bool empty() const
+	{
+		return !rootNode.has_children();
+	};
 	//iterator insert(const value_type& value);
 	//XXX muss iterator returnen
 	void insert(const value_type& value) {
@@ -96,7 +127,14 @@ public:
 		n.attach(new Leaf(value.second));
 	}
 	void erase(const key_type& value);
-	void clear(); // erase all
+	void clear() // erase all
+	{
+		rootNode.clear();
+	};
+	void print()
+	{
+		rootNode.print();
+	};
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
 //	iterator upper_bound(const key_type& testElement);	// first element > testElement
 //	iterator find(const key_type& testElement);			// first element == testElement
