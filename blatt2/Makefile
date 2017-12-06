@@ -2,8 +2,9 @@
 CC=g++
 
 main: main.cpp Trie.h
-	$(CC) -g -std=c++11 main.cpp -o main
+	$(CC) -g -finput-charset=UTF-8 -std=c++11 main.cpp -o main
 
+.PHONY: test
 test: main
 	./main
 
