@@ -10,13 +10,15 @@
 
 #include <string>
 #include <map>
+#include <cassert>
 using namespace std;
+
+#define TERMINAL 0xff
 
 template <class T, class E=char>
 class Trie
 {
-	const uint8_t TERMINAL = 0xFF;
-
+protected:
 	class Node
 	{
 	public:
@@ -32,14 +34,14 @@ class Trie
 	class Leaf : public Node
 	{
 	public:
-		Leaf(T param) {
+		Leaf(T param) : Node(TERMINAL) {
 			// XXX sollte evtl reference sein?
 			value = param;
 		}
 		void print(int depth){
 			printf("%*s", depth * 2, "");
-			// XXX Wert mit ausgeben...
-			printf(value + "\n");
+			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
+			printf("%s\n", value.c_str());
 		};
 		T&  get() {
 			return value;
@@ -47,7 +49,7 @@ class Trie
 		void clear()
 		{
 			// XXX evtl. value löschen.
-			delete value;
+			//delete value;
 		};
 	private:
 		T value;
@@ -88,11 +90,13 @@ class Trie
 		};
 
 		// Returns a pointer to a node (and possibly creates it)
-		Node& get_reference_or_create(E part) {
+		InnerNode& get_reference_or_create(E part) {
+			assert(part != TERMINAL);
 			if (!children.count(part)) {
-				children.insert(std::make_pair(part, new InnerNode()));
+				children.insert(std::make_pair(part, new InnerNode(part)));
 			}
-			return *(children[part]);
+			// XXX unschoen... dynamic_cast
+			return *((InnerNode*)children[part]);
 		}
 
 		bool has_children() const
@@ -111,16 +115,16 @@ public:
 	//typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln…
 	bool empty() const
 	{
-		return !rootNode.has_children();
+		return !root_node.has_children();
 	};
 	//iterator insert(const value_type& value);
 	//XXX muss iterator returnen
 	void insert(const value_type& value) {
 		printf("Inserting value for key %s\n", value.first.c_str());
-		Node& n = root_node;
+		InnerNode& n = root_node;
 		for (int i = 0; i < value.first.length(); i++) {
 			printf("Searching inner node for char '%c'\n", value.first[i]);
-			n = get_reference_or_create(value.first[i]);
+			n = n.get_reference_or_create(value.first[i]);
 		}
 
 		// We now have the InnerNode to attach the value (Leaf) to in n
@@ -129,11 +133,11 @@ public:
 	void erase(const key_type& value);
 	void clear() // erase all
 	{
-		rootNode.clear();
+		root_node.clear();
 	};
 	void print()
 	{
-		rootNode.print();
+		root_node.print();
 	};
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
 //	iterator upper_bound(const key_type& testElement);	// first element > testElement
@@ -142,7 +146,7 @@ public:
 //	iterator end();
 
 private:
-	InnerNode rootNode = InnerNode(0);
+	InnerNode root_node = InnerNode(0);
 };
 
 #endif /* TRIE_H_ */
