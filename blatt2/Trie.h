@@ -116,7 +116,39 @@ public:
 	typedef basic_string<E> key_type;	// string=basic_string<char>
 	typedef pair<const key_type, T> value_type;
 	typedef T mapped_type;
-	//typedef ... iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln
+
+	class TrieIterator : public	std::iterator<
+				std::forward_iterator_tag,   // iterator_category
+				T,                        // value_type
+				int,                      // difference_type
+				const T*,               // pointer
+				T                       // reference
+				>{
+	private:
+		Trie<T, E> *current;
+	public:
+		TrieIterator(Trie<T, E> *start) : current(start) {}
+		TrieIterator& operator++() {
+			// implement me
+			return *this;
+		}
+		TrieIterator operator++(int) {
+			// implement me
+			return this;
+		}
+		bool operator==(TrieIterator other) const {
+			return true;
+		}
+
+		bool operator!=(TrieIterator other) const {
+			return false;
+		}
+		T operator*() const {
+			return *current;
+		}
+	};
+
+	typedef TrieIterator iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln
 	bool empty() const
 	{
 		return !root_node.has_children();
