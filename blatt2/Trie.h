@@ -125,9 +125,9 @@ public:
 				T                       // reference
 				>{
 	private:
-		Trie<T, E> *current;
+		Leaf *current;
 	public:
-		TrieIterator(Trie<T, E> *start) : current(start) {}
+		TrieIterator(Leaf *start) : current(start) {}
 		TrieIterator& operator++() {
 			// implement me
 			return *this;
@@ -153,9 +153,7 @@ public:
 	{
 		return !root_node.has_children();
 	};
-	//iterator insert(const value_type& value);
-	//XXX muss iterator returnen
-	void insert(const value_type& value) {
+	iterator insert(const value_type& value) {
 #ifdef DEBUG
 		printf("Inserting value for key %s\n", value.first.c_str());
 #endif
@@ -173,7 +171,9 @@ public:
 #endif
 		}
 		// We now have the InnerNode to attach the value (Leaf) to in n
-		n->attach(new Leaf(value.second));
+		Leaf *new_leaf;
+		n->attach(new_leaf = new Leaf(value.second));
+		return *(new iterator(new_leaf));
 	}
 	void erase(const key_type& value);
 	void clear() // erase all
