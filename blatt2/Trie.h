@@ -43,7 +43,7 @@ protected:
 			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
 			printf("\"%s\"\n", value.c_str());
 		};
-		T&  get() {
+		T& get() {
 			return value;
 		}
 		void clear()
@@ -125,26 +125,35 @@ public:
 				T                       // reference
 				>{
 	private:
+		// NULL means iterator is past the last element
 		Leaf *current;
 	public:
 		TrieIterator(Leaf *start) : current(start) {}
 		TrieIterator& operator++() {
+			if (current == NULL)
+				throw std::logic_error("Increment iterator end\n");
 			// implement me
 			return *this;
 		}
 		TrieIterator operator++(int) {
+			if (current == NULL)
+				throw std::logic_error("Increment iterator end\n");
 			// implement me
 			return this;
 		}
 		bool operator==(TrieIterator other) const {
+			// implement me
 			return true;
 		}
 
 		bool operator!=(TrieIterator other) const {
+			// implement me
 			return false;
 		}
 		T operator*() const {
-			return *current;
+			if (current == NULL)
+				throw std::logic_error("Increment iterator end\n");
+			return current->get();
 		}
 	};
 
