@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 #include <cassert>
+#include <typeinfo>
+
 using namespace std;
 
 #define TERMINAL 0xff
@@ -20,6 +22,9 @@ protected:
 		virtual void print(int depth) = 0;
 		E getId(){return id;};
 		virtual void clear() = 0;
+		Node *get_parent() const {
+			return parent;
+		}
 	protected:
 		E id;
 	private:
@@ -33,22 +38,65 @@ protected:
 			// XXX sollte evtl reference sein?
 			value = param;
 		}
+
 		void print(int depth){
 			printf("%*s", depth * 2, "");
 			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
-			printf("\"%s\"\n", value.c_str());
-		};
+			printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this, Node::get_parent());
+		}
+
 		T& get() {
 			return value;
 		}
+
 		void clear()
 		{
 			// XXX evtl. value löschen.
 			//delete value;
-		};
+		}
 
-		Node* get_first_leaf() const {
-			return &this;
+		// return pointer to next leaf, or NULL if last element
+		Leaf* find_next() const {
+			// find the fist node of the next branch of the tree
+			// (will be in next).
+			Node *next = NULL;
+			// 1.) go up by one
+			InnerNode *parent = (InnerNode*)Node::get_parent();
+
+#ifdef DEBUG
+			printf("%s: %p: find_next()\n", __func__, this);
+#endif
+
+			InnerNode *search_from = (InnerNode*)this;
+
+			while (1) {
+#ifdef DEBUG
+				printf("%s: %p: next=%p\t parent=%p\n", __func__, this, next, parent);
+#endif
+
+				// 2a) (!= null) get next branch and be happy
+				next = parent->next_or_null(search_from);
+				if (next != NULL)
+					break;
+
+				// 2b) (== null) go up one more parent and just get the first element
+				search_from = parent;
+				// XXX remove null logic from next_or_null()
+				parent = (InnerNode*)parent->get_parent();
+
+				if (parent == NULL) {
+					printf("parent==NULL\n");
+					return NULL;
+				}
+			}
+
+			// now check if this is a leaf, then we're done
+			if (dynamic_cast<Leaf*>(next) == nullptr) {
+				InnerNode *n = (InnerNode*)next;
+				return (Leaf*)n->get_first_leaf();
+			} else {
+				return (Leaf*)next;
+			}
 		}
 	private:
 		T value;
@@ -63,12 +111,35 @@ protected:
 		void print(int depth){
 			if (depth > 0)
 				printf("%*s⌙", depth * 2 - 1, "");
-			printf("%c:\n", Node::id == 0 ? 'R' : Node::id);
+			printf("%c (this=%p parent=%p):\n", Node::id == 0 ? 'R' : Node::id, this, Node::get_parent());
 			for(auto itr = children.begin(); itr != children.end(); ++itr)
 			{
 				(*(*itr).second).print(depth + 1);
 			}
-		};
+		}
+
+		Node* next_or_null(InnerNode *element) {
+			for(auto it = children.begin(); it != children.end(); ++it) {
+#ifdef DEBUG
+				printf("%s: %p: searching for %p <=> *it.second=%p\n", __func__, this, element, (*it).second);
+#endif
+				if ((*it).second == element) {
+					it++;
+					if (it == children.end()) {
+#ifdef DEBUG
+						printf("%s: next one is end...\n", __func__);
+#endif
+						return NULL;
+					} else {
+#ifdef DEBUG
+						printf("%s: found next one @ %p\n", __func__, (*it).second);
+#endif
+						return (*it).second;
+					}
+				}
+			}
+			return NULL;
+		}
 
 		void clear()
 		{
@@ -106,8 +177,21 @@ protected:
 			return !children.empty();
 		}
 
-		Node* get_first_child() const {
-			return (*children.begin()).get_first_leaf();
+		InnerNode* get_first_leaf() const {
+			auto n = (*(children.begin())).second;
+			if (dynamic_cast<Leaf*>(n) == nullptr) {
+#ifdef DEBUG
+				printf("%s: n is not a leaf (%s), calling %p->get_first_leaf()\n", __func__, typeid(n).name(), n);
+#endif
+				// not a leaf
+				return ((InnerNode*)n)->get_first_leaf();
+			} else {
+#ifdef DEBUG
+				printf("%s: a leaf, returning %p\n", __func__, n);
+#endif
+				return (InnerNode*)n;
+			}
+			// assert map not empty
 		}
 	private:
 		map<E, Node*> children;		// evtl. auch austauschen in Sortierte Liste.
@@ -132,9 +216,10 @@ public:
 	public:
 		TrieIterator(Leaf *start) : current(start) {}
 		TrieIterator& operator++() {
+			// preincrement
 			if (current == NULL)
 				throw std::logic_error("Increment iterator end\n");
-			// implement me
+			current = current->find_next();
 			return *this;
 		}
 		TrieIterator operator++(int) {
@@ -159,11 +244,12 @@ public:
 		}
 	};
 
-	typedef TrieIterator iterator;	// ...: keine C/C++ Ellipse, sondern von Ihnen zu entwickeln
-	bool empty() const
-	{
+	typedef TrieIterator iterator;
+
+	bool empty() const {
 		return !root_node.has_children();
-	};
+	}
+
 	iterator insert(const value_type& value) {
 #ifdef DEBUG
 		printf("Inserting value for key %s\n", value.first.c_str());
@@ -186,25 +272,28 @@ public:
 		n->attach(new_leaf = new Leaf(value.second, n));
 		return *(new iterator(new_leaf));
 	}
+
 	void erase(const key_type& value);
-	void clear() // erase all
-	{
+
+	void clear() { // erase all
 		root_node.clear();
-	};
-	void print()
-	{
+	}
+
+	void print() {
 		root_node.print(0);
-	};
+	}
+
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
 //	iterator upper_bound(const key_type& testElement);	// first element > testElement
 //	iterator find(const key_type& testElement);			// first element == testElement
-	// returns end() if not found
-	//iterator begin() {
-	//	if (!root_node.has_children()) {
-	//		return end();
-	//	}
-	//	return *(new iterator((Leaf*)root_node.get_first_leaf()));
-	//}
+
+	iterator begin() { // returns end() if not found
+		if (!root_node.has_children()) {
+			return end();
+		}
+		return *(new iterator((Leaf*)root_node.get_first_leaf()));
+	}
+
 	iterator end() {
 		// XXX maybe don't allocate one on the heap
 		return *(new iterator(NULL));
