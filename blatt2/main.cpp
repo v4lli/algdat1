@@ -13,6 +13,7 @@ int main(void) {
 
 	printf("t.empty()=%d\n", t.empty());
 	printf("iterator deref for key 'kuhl': %s\n", (*print_later).c_str());
+	//printf("begin() deref: %s\n", (*t.begin()).c_str());
 
 	//t.clear();
 

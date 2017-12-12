@@ -1,10 +1,3 @@
-/*
- * Trie.h
- *
- *  Created on: 29.11.2017
- *      Author: Angelika
- */
-
 #ifndef TRIE_H_
 #define TRIE_H_
 
@@ -22,19 +15,21 @@ protected:
 	class Node
 	{
 	public:
-		Node(E my_id): id(my_id) { };
+		Node(E my_id, Node *my_parent): id(my_id), parent(my_parent) {};
 		~Node() {};
 		virtual void print(int depth) = 0;
 		E getId(){return id;};
 		virtual void clear() = 0;
 	protected:
 		E id;
+	private:
+		Node *parent;
 	};
 
 	class Leaf : public Node
 	{
 	public:
-		Leaf(T param) : Node(TERMINAL) {
+		Leaf(T param, Node *my_parent) : Node(TERMINAL, my_parent) {
 			// XXX sollte evtl reference sein?
 			value = param;
 		}
@@ -51,6 +46,10 @@ protected:
 			// XXX evtl. value löschen.
 			//delete value;
 		};
+
+		Node* get_first_leaf() const {
+			return &this;
+		}
 	private:
 		T value;
 	};
@@ -58,7 +57,7 @@ protected:
 	class InnerNode : public Node
 	{
 	public:
-		InnerNode(E my_id) : Node(my_id) {};
+		InnerNode(E my_id, Node *my_parent) : Node(my_id, my_parent) {};
 		// XXX: Destruktoren klären.
 		~InnerNode() {};
 		void print(int depth){
@@ -97,16 +96,19 @@ protected:
 #ifdef DEBUG
 				printf("create new\n");
 #endif
-				children.insert(std::make_pair(part, new InnerNode(part)));
+				children.insert(std::make_pair(part, new InnerNode(part, this)));
 			}
 			// XXX unschoen... dynamic_cast
 			return (InnerNode*)children[part];
 		}
 
-		bool has_children() const
-		{
+		bool has_children() const {
 			return !children.empty();
-		};
+		}
+
+		Node* get_first_child() const {
+			return (*children.begin()).get_first_leaf();
+		}
 	private:
 		map<E, Node*> children;		// evtl. auch austauschen in Sortierte Liste.
 	};
@@ -181,7 +183,7 @@ public:
 		}
 		// We now have the InnerNode to attach the value (Leaf) to in n
 		Leaf *new_leaf;
-		n->attach(new_leaf = new Leaf(value.second));
+		n->attach(new_leaf = new Leaf(value.second, n));
 		return *(new iterator(new_leaf));
 	}
 	void erase(const key_type& value);
@@ -196,11 +198,20 @@ public:
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
 //	iterator upper_bound(const key_type& testElement);	// first element > testElement
 //	iterator find(const key_type& testElement);			// first element == testElement
-//	iterator begin();									// returns end() if not found
-//	iterator end();
+	// returns end() if not found
+	//iterator begin() {
+	//	if (!root_node.has_children()) {
+	//		return end();
+	//	}
+	//	return *(new iterator((Leaf*)root_node.get_first_leaf()));
+	//}
+	iterator end() {
+		// XXX maybe don't allocate one on the heap
+		return *(new iterator(NULL));
+	}
 
 private:
-	InnerNode root_node = InnerNode(0);
+	InnerNode root_node = InnerNode(0, NULL);
 };
 
 #endif /* TRIE_H_ */
