@@ -274,7 +274,16 @@ public:
 		return *(new iterator(new_leaf));
 	}
 
-	void erase(const key_type& value);
+	void erase(const key_type& value){
+		// XXX Ablauf:
+		// 1. Blatt finden (hier lohnt sich find())
+		// 2. Blatt löschen
+		// 3. für alle Eltern-Knoten (von unten nach oben):
+		//	  wenn ihr letztes Kind gelöscht wurde, auch den Eltern-Knoten löschen
+		// Evtl: Den Eltern-Knoten suchen (vom Blatt aus),
+		//		 der mehr als ein Kind hat und dort den
+		//		 entsprechenden Teilbaum mit clear löschen.
+	}
 
 	void clear() { // erase all
 		root_node.clear();
