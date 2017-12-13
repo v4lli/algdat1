@@ -145,11 +145,12 @@ protected:
 		{
 			if(has_children())
 			{
-				for(auto itr = children.begin(); itr != children.end();)
+				for(auto itr = children.begin(); itr != children.end(); ++itr)
 				{
 					(*itr).second->clear();
-					children.erase(itr);
 				}
+				// Geht schneller als einzelne Elemente mit erase entfernen.
+				children.clear();
 			}
 			// XXX Evtl. map noch löschen.
 			//delete children;

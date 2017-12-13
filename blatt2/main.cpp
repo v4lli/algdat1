@@ -17,7 +17,7 @@ int main(void) {
 	printf("iterator++ deref for key 'kuh': %s\n", (*(++print_later_kuh)).c_str());
 	printf("begin() deref: %s\n", (*t.begin()).c_str());
 
-	//t.clear();
+	t.clear();
 
 	return 0;
 }
