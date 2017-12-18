@@ -1,6 +1,14 @@
 #ifndef TRIE_H_
 #define TRIE_H_
 
+
+/*
+ * TODO
+ *
+ * - print mit << >> machen anstatt mit printf(), da %s nur fuer T=string
+ *   korrekt ist
+ */
+
 #include <string>
 #include <map>
 #include <cassert>
@@ -19,7 +27,7 @@ protected:
 	public:
 		Node(E my_id, Node *my_parent): id(my_id), parent(my_parent) {};
 		~Node() {};
-		virtual void print(int depth) = 0;
+		virtual void print(int depth) const = 0;
 		E getId(){return id;};
 		virtual void clear() = 0;
 		Node *get_parent() const {
@@ -35,11 +43,10 @@ protected:
 	{
 	public:
 		Leaf(T param, Node *my_parent) : Node(TERMINAL, my_parent) {
-			// XXX sollte evtl reference sein?
 			value = param;
 		}
 
-		void print(int depth){
+		void print(int depth) const {
 			printf("%*s", depth * 2, "");
 			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
 			printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this, Node::get_parent());
@@ -49,13 +56,11 @@ protected:
 			return value;
 		}
 
-		void clear()
-		{
-			// XXX evtl. value löschen.
-			//delete value;
-		}
+		// Nothing to do here, value is an object variable
+		void clear() { }
 
-		// return pointer to next leaf, or NULL if last element
+		// return pointer to logically next leaf, or NULL if this is
+		// the last element.
 		Leaf* find_next() const {
 			// find the fist node of the next branch of the tree
 			// (will be in next).
@@ -71,7 +76,8 @@ protected:
 
 			while (1) {
 #ifdef DEBUG
-				printf("%s: %p: next=%p\t parent=%p\n", __func__, this, next, parent);
+				printf("%s: %p: next=%p\t parent=%p\n",
+				    __func__, this, next, parent);
 #endif
 
 				// 2a) (!= null) get next branch and be happy
@@ -79,22 +85,31 @@ protected:
 				if (next != NULL)
 					break;
 
-				// 2b) (== null) go up one more parent and just get the first element
+				// 2b) (== null) go up one more parent and just
+				// get the first element
 				search_from = parent;
-				// XXX remove null logic from next_or_null()
 				parent = (InnerNode*)parent->get_parent();
 
+				// this means we tried to go up once more, but
+				// were already at the root node -> no next
+				// element.
 				if (parent == NULL) {
+#ifdef DEBUG
 					printf("parent==NULL\n");
+#endif
 					return NULL;
 				}
 			}
 
-			// now check if this is a leaf, then we're done
+			// now check if 'next' is a leaf
 			if (dynamic_cast<Leaf*>(next) == nullptr) {
+				// It's not a leaf, we need to go down all the
+				// way, always choosing the first branch option
+				// at InnerNodes.
 				InnerNode *n = (InnerNode*)next;
 				return (Leaf*)n->get_first_leaf();
 			} else {
+				// we're done, 'next' is the next leaf
 				return (Leaf*)next;
 			}
 		}
@@ -108,12 +123,15 @@ protected:
 		InnerNode(E my_id, Node *my_parent) : Node(my_id, my_parent) {};
 		// XXX: Destruktoren klären.
 		~InnerNode() {};
-		void print(int depth){
+		void print(int depth) const {
 			if (depth > 0)
 				printf("%*s⌙", depth * 2 - 1, "");
-			printf("%c (this=%p parent=%p):\n", Node::id == 0 ? 'R' : Node::id, this, Node::get_parent());
-			for(auto itr = children.begin(); itr != children.end(); ++itr)
-			{
+
+			printf("%c (this=%p parent=%p):\n",
+			    Node::id == 0 ? 'R' : Node::id, this,
+			    Node::get_parent());
+
+			for(auto itr = children.begin(); itr != children.end(); ++itr) {
 				(*(*itr).second).print(depth + 1);
 			}
 		}
@@ -214,8 +232,10 @@ public:
 	private:
 		// NULL means iterator is past the last element
 		Leaf *current;
+		// need parent trie association for compare
+		Trie *trie;
 	public:
-		TrieIterator(Leaf *start) : current(start) {}
+		TrieIterator(Leaf *start, Trie *parent) : current(start), trie(parent) {}
 		TrieIterator& operator++() {
 			// preincrement
 			if (current == NULL)
@@ -271,7 +291,7 @@ public:
 		// We now have the InnerNode to attach the value (Leaf) to in n
 		Leaf *new_leaf;
 		n->attach(new_leaf = new Leaf(value.second, n));
-		return *(new iterator(new_leaf));
+		return iterator(new_leaf, this);
 	}
 
 	void erase(const key_type& value){
@@ -301,12 +321,11 @@ public:
 		if (!root_node.has_children()) {
 			return end();
 		}
-		return *(new iterator((Leaf*)root_node.get_first_leaf()));
+		return iterator((Leaf*)root_node.get_first_leaf(), this);
 	}
 
 	iterator end() {
-		// XXX maybe don't allocate one on the heap
-		return *(new iterator(NULL));
+		return iterator(NULL, this);
 	}
 
 private:
