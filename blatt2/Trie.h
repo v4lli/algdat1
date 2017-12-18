@@ -199,6 +199,7 @@ protected:
 				for(auto itr = children.begin(); itr != children.end(); ++itr)
 				{
 					(*itr).second->clear();
+					delete (*itr).second;
 				}
 				// Geht schneller als einzelne Elemente mit erase entfernen.
 				children.clear();
