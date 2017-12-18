@@ -1,7 +1,6 @@
 #ifndef TRIE_H_
 #define TRIE_H_
 
-
 /*
  * TODO
  *
@@ -11,6 +10,10 @@
  * - erase implementieren
  * - hauptprogramm schreiben
  * - insert mit bereits existierendem wert
+ * - ggf. alles effizienter machen indem InnerNode keine map mehr enthaelt
+ *   sondern eine sortierte liste o.ae.
+ * - faedelung statt parent-zeiger fuer find() und iterator++ implementieren
+ * - iterator.get_key() effizienter machen (evtl key im leaf speichern?)
  */
 
 #include <string>
@@ -154,7 +157,6 @@ protected:
 	class InnerNode : public Node {
 	public:
 		InnerNode(E my_id, Node *my_parent) : Node(my_id, my_parent) {};
-		// XXX: Destruktoren klären.
 		~InnerNode() {};
 		void print(int depth) const {
 			if (depth > 0)
@@ -248,7 +250,7 @@ protected:
 			}
 		}
 	private:
-		map<E, Node*> children;		// evtl. auch austauschen in Sortierte Liste.
+		map<E, Node*> children;		// XXX evtl. auch austauschen in Sortierte Liste.
 	};
 
 public:
