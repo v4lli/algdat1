@@ -22,8 +22,7 @@ template <class T, class E=char>
 class Trie
 {
 protected:
-	class Node
-	{
+	class Node {
 	public:
 		Node(E my_id, Node *my_parent): id(my_id), parent(my_parent) {};
 		~Node() {};
@@ -39,8 +38,7 @@ protected:
 		Node *parent;
 	};
 
-	class Leaf : public Node
-	{
+	class Leaf : public Node {
 	public:
 		Leaf(T param, Node *my_parent) : Node(TERMINAL, my_parent) {
 			value = param;
@@ -88,14 +86,14 @@ protected:
 				// 2b) (== null) go up one more parent and just
 				// get the first element
 				search_from = parent;
-				parent = (InnerNode*)parent->get_parent();
+				parent = dynamic_cast<InnerNode*>(parent->get_parent());
 
 				// this means we tried to go up once more, but
 				// were already at the root node -> no next
 				// element.
 				if (parent == NULL) {
 #ifdef DEBUG
-					printf("parent==NULL\n");
+					printf("%s: parent==NULL\n", __func__);
 #endif
 					return NULL;
 				}
@@ -106,19 +104,17 @@ protected:
 				// It's not a leaf, we need to go down all the
 				// way, always choosing the first branch option
 				// at InnerNodes.
-				InnerNode *n = (InnerNode*)next;
-				return (Leaf*)n->get_first_leaf();
+				return dynamic_cast<InnerNode*>(next)->get_first_leaf();
 			} else {
 				// we're done, 'next' is the next leaf
-				return (Leaf*)next;
+				return dynamic_cast<Leaf*>(next);
 			}
 		}
 	private:
 		T value;
 	};
 
-	class InnerNode : public Node
-	{
+	class InnerNode : public Node {
 	public:
 		InnerNode(E my_id, Node *my_parent) : Node(my_id, my_parent) {};
 		// XXX: Destruktoren klären.
@@ -170,8 +166,6 @@ protected:
 				// Geht schneller als einzelne Elemente mit erase entfernen.
 				children.clear();
 			}
-			// XXX Evtl. map noch löschen.
-			//delete children;
 		};
 
 		void attach(Leaf* child)
@@ -186,31 +180,34 @@ protected:
 #ifdef DEBUG
 				printf("create new\n");
 #endif
-				children.insert(std::make_pair(part, new InnerNode(part, this)));
+				children.insert(std::make_pair(part,
+				    new InnerNode(part, this)));
 			}
-			// XXX unschoen... dynamic_cast
-			return (InnerNode*)children[part];
+			return dynamic_cast<InnerNode*>(children[part]);
 		}
 
 		bool has_children() const {
 			return !children.empty();
 		}
 
-		InnerNode* get_first_leaf() const {
+		Leaf* get_first_leaf() const {
+			assert(children.size() > 0);
 			auto n = (*(children.begin())).second;
 			if (dynamic_cast<Leaf*>(n) == nullptr) {
 #ifdef DEBUG
-				printf("%s: n is not a leaf (%s), calling %p->get_first_leaf()\n", __func__, typeid(n).name(), n);
+				printf("%s: n is not a leaf (%s), calling "
+				    "%p->get_first_leaf()\n", __func__,
+				    typeid(n).name(), n);
 #endif
 				// not a leaf
-				return ((InnerNode*)n)->get_first_leaf();
+				return dynamic_cast<InnerNode*>(n)->get_first_leaf();
 			} else {
 #ifdef DEBUG
-				printf("%s: a leaf, returning %p\n", __func__, n);
+				printf("%s: a leaf, returning %p\n", __func__,
+				    n);
 #endif
-				return (InnerNode*)n;
+				return dynamic_cast<Leaf*>(n);
 			}
-			// assert map not empty
 		}
 	private:
 		map<E, Node*> children;		// evtl. auch austauschen in Sortierte Liste.
