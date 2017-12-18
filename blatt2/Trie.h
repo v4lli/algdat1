@@ -7,11 +7,16 @@
  *
  * - print mit << >> machen anstatt mit printf(), da %s nur fuer T=string
  *   korrekt ist
+ * - lower_bound() und upper_bound() implementieren
+ * - erase implementieren
+ * - hauptprogramm schreiben
+ * - insert mit bereits existierendem wert
  */
 
 #include <string>
 #include <map>
 #include <cassert>
+#include <list>
 #include <typeinfo>
 
 using namespace std;
@@ -21,13 +26,21 @@ using namespace std;
 template <class T, class E=char>
 class Trie
 {
+public:
+	typedef basic_string<E> key_type;	// string=basic_string<char>
+	typedef pair<const key_type, T> value_type;
+	typedef T mapped_type;
 protected:
 	class Node {
 	public:
 		Node(E my_id, Node *my_parent): id(my_id), parent(my_parent) {};
 		~Node() {};
 		virtual void print(int depth) const = 0;
-		E getId(){return id;};
+
+		E getId() const {
+			return id;
+		}
+
 		virtual void clear() = 0;
 		Node *get_parent() const {
 			return parent;
@@ -47,11 +60,35 @@ protected:
 		void print(int depth) const {
 			printf("%*s", depth * 2, "");
 			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
-			printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this, Node::get_parent());
+			printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this,
+			    Node::get_parent());
 		}
 
 		T& get() {
 			return value;
+		}
+
+		key_type get_key() const {
+			std::list<char> keys;
+
+			Node *parent = Node::get_parent();
+			while (parent != NULL) {
+				if (parent->getId() != 0)
+					keys.push_back(parent->getId());
+				parent = parent->get_parent();
+			}
+
+			char *out = new char[keys.size()];
+			int i;
+			auto rit = keys.rbegin();
+
+			for (i = 0, rit = keys.rbegin(); rit != keys.rend(); ++rit, i++)
+				out[i] = *rit;
+
+			string ret(out);
+			delete[] out;
+
+			return ret;
 		}
 
 		// Nothing to do here, value is an object variable
@@ -215,9 +252,6 @@ protected:
 
 public:
 	Trie() {};
-	typedef basic_string<E> key_type;	// string=basic_string<char>
-	typedef pair<const key_type, T> value_type;
-	typedef T mapped_type;
 
 	class TrieIterator : public	std::iterator<
 				std::forward_iterator_tag,   // iterator_category
@@ -233,28 +267,49 @@ public:
 		Trie *trie;
 	public:
 		TrieIterator(Leaf *start, Trie *parent) : current(start), trie(parent) {}
+		TrieIterator(TrieIterator *that) : current(that->get_current()), trie(that->get_parent()) {}
+
+		Leaf *get_current() const {
+			return current;
+		}
+
+		Trie *get_parent() const {
+			return trie;
+		}
+
+		key_type get_key() {
+			return current->get_key();
+		}
+
+		// preincrement
 		TrieIterator& operator++() {
-			// preincrement
 			if (current == NULL)
 				throw std::logic_error("Increment iterator end\n");
 			current = current->find_next();
 			return *this;
 		}
+
+		// postincrement
 		TrieIterator operator++(int) {
+			TrieIterator clone(this);
+
+			current = current->find_next();
 			if (current == NULL)
 				throw std::logic_error("Increment iterator end\n");
-			// implement me
-			return this;
+
+			return clone;
 		}
+
 		bool operator==(TrieIterator other) const {
-			// implement me
-			return true;
+			return (get_current() == other.get_current() &&
+				get_parent() == other.get_parent());
 		}
 
 		bool operator!=(TrieIterator other) const {
-			// implement me
-			return false;
+			return (get_current() != other.get_current() ||
+				get_parent() != other.get_parent());
 		}
+
 		T operator*() const {
 			if (current == NULL)
 				throw std::logic_error("Increment iterator end\n");
@@ -312,7 +367,13 @@ public:
 
 //	iterator lower_bound(const key_type& testElement);	// first element >= testElement
 //	iterator upper_bound(const key_type& testElement);	// first element > testElement
-//	iterator find(const key_type& testElement);			// first element == testElement
+	iterator find(const key_type &testElement) {			// first element == testElement
+		auto it = begin();
+		while (it != end() && it.get_key().compare(testElement) != 0) {
+			it++;
+		}
+		return it;
+	}
 
 	iterator begin() { // returns end() if not found
 		if (!root_node.has_children()) {
