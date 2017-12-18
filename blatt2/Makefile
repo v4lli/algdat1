@@ -5,7 +5,7 @@ CPPFLAGS += -DDEBUG
 main: main.cpp Trie.h Makefile
 	$(CC) -g -finput-charset=UTF-8 -std=c++11 main.cpp -o main
 
-.PHONY: test debug
+.PHONY: test debug valgrind
 test: main
 	./main
 
@@ -14,3 +14,6 @@ debug: main
 
 clean:
 	rm -f main *.o
+
+valgrind: main
+	valgrind --leak-check=full ./main
