@@ -21,6 +21,7 @@
 #include <cassert>
 #include <list>
 #include <typeinfo>
+#include <iostream>
 
 using namespace std;
 
@@ -63,8 +64,10 @@ protected:
 		void print(int depth) const {
 			printf("%*s", depth * 2, "");
 			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
-			printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this,
-			    Node::get_parent());
+			cout << "\"" << value << "\" (this=" << this
+				 << "p=" << Node::get_parent() << endl;
+			//printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this,
+			    //Node::get_parent());
 		}
 
 		T& get() {
@@ -162,9 +165,11 @@ protected:
 			if (depth > 0)
 				printf("%*s⌙", depth * 2 - 1, "");
 
-			printf("%c (this=%p parent=%p):\n",
-			    Node::id == 0 ? 'R' : Node::id, this,
-			    Node::get_parent());
+			cout << Node::id == 0 ? 'R' : Node::id << " (this=" << this
+				 << " parent=" << Node::get_parent() << endl;
+			//printf("%c (this=%p parent=%p):\n",
+			    //Node::id == 0 ? 'R' : Node::id, this,
+			    //Node::get_parent());
 
 			for(auto itr = children.begin(); itr != children.end(); ++itr) {
 				(*(*itr).second).print(depth + 1);
@@ -207,6 +212,11 @@ protected:
 				children.clear();
 			}
 		};
+
+		void remove_child(E child_id)
+		{
+			children.erase(id);
+		}
 
 		void attach(Leaf* child)
 		{
@@ -350,14 +360,26 @@ public:
 	}
 
 	void erase(const key_type& value){
-		// XXX Ablauf:
-		// 1. Blatt finden (hier lohnt sich find())
-		// 2. Blatt löschen
-		// 3. für alle Eltern-Knoten (von unten nach oben):
-		//	  wenn ihr letztes Kind gelöscht wurde, auch den Eltern-Knoten löschen
-		// Evtl: Den Eltern-Knoten suchen (vom Blatt aus),
-		//		 der mehr als ein Kind hat und dort den
-		//		 entsprechenden Teilbaum mit clear löschen.
+		// Das Kind finden, das zu löschen ist.
+		auto it = find(value);
+		Leaf current = it.get_current();
+		// Id merken und Eltern-Knoten suchen.
+		E id = current.getId();
+		InnerNode* parent = current.get_parent();
+		// Das Kind im Eltern-Knoten löschen
+		parent->remove_child(id);
+		while (!parent->has_children())
+		{
+			// Wenn es das letzte Kind war, auch den Eltern-Knoten löschen.
+			id = parent->getId();
+			parent = parent->get_parent();
+			parent->remove_child(id);
+		}
+
+		// XXX Evtl:
+		//		Den Eltern-Knoten suchen (vom Blatt aus),
+		//		der mehr als ein Kind hat und dort den
+		//		entsprechenden Teilbaum mit clear löschen.
 	}
 
 	void clear() { // erase all
