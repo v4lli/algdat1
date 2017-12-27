@@ -215,7 +215,7 @@ protected:
 
 		void remove_child(E child_id)
 		{
-			children.erase(id);
+			children.erase(Node::id);
 		}
 
 		void attach(Leaf* child)
@@ -362,10 +362,10 @@ public:
 	void erase(const key_type& value){
 		// Das Kind finden, das zu löschen ist.
 		auto it = find(value);
-		Leaf current = it.get_current();
+		Leaf *current = it.get_current();
 		// Id merken und Eltern-Knoten suchen.
-		E id = current.getId();
-		InnerNode* parent = current.get_parent();
+		E id = current->getId();
+		InnerNode* parent = current->get_parent();
 		// Das Kind im Eltern-Knoten löschen
 		parent->remove_child(id);
 		while (!parent->has_children())

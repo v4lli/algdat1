@@ -8,7 +8,7 @@
 	printf("\n############### DUMP END ###############\n"); \
 }
 
-Trie<string, char> trie = new Trie<string, char>();
+Trie<string, char> trie = Trie<string, char>();
 
 void test(void)
 {
@@ -187,11 +187,11 @@ void menu(void)
 				break;
 			case 'l':	// LowerBound ausgeben.
 			case 'L':
-				findLowerBound();
+				//findLowerBound();
 				break;
 			case 'u':	// UpperBound ausgeben.
 			case 'U':
-				findUpperBound();
+				//findUpperBound();
 				break;
 			case 'q':	// Programm beenden.
 			case 'Q':
