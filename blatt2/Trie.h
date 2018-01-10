@@ -16,12 +16,13 @@
  * - iterator.get_key() effizienter machen (evtl key im leaf speichern?)
  */
 
-#include <string>
-#include <map>
 #include <cassert>
-#include <list>
-#include <typeinfo>
+#include <cstring>
 #include <iostream>
+#include <list>
+#include <map>
+#include <string>
+#include <typeinfo>
 
 using namespace std;
 
@@ -85,7 +86,9 @@ protected:
 				parent = parent->get_parent();
 			}
 
-			char *out = new char[keys.size()];
+			char *out = new char[keys.size()+1];
+			memset(out, 0, keys.size()+1);
+
 			int i;
 			auto rit = keys.rbegin();
 
