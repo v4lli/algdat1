@@ -363,6 +363,10 @@ public:
 	void erase(const key_type& value){
 		// Das Kind finden, das zu löschen ist.
 		auto it = find(value);
+		if(it == end())
+		{
+			throw std::invalid_argument("Element not found.");
+		}
 		Leaf *current = it.get_current();
 		// Id merken und Eltern-Knoten suchen.
 		E id = current->getId();
