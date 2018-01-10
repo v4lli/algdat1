@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include "Trie.h"
 
 #define DUMP() {\
@@ -48,7 +49,7 @@ void insertElement(void)
 	printf("Element angeben in der Form:\n");
 	printf("Key Value\n");
 	string key_value;
-	cin >> key_value;
+	std::cin >> key_value;
 	string::size_type found = key_value.find(" ");
 	if(found != string::npos)
 	{
@@ -72,7 +73,7 @@ void findElement(void)
 	}
 	printf("Nach welchem Key wollen Sie suchen?\n");
 	string key;
-	cin << key;
+	std::cin >> key;
 	auto found = trie.find(key);
 	if(found == trie.end())
 	{
@@ -80,7 +81,7 @@ void findElement(void)
 	}
 	else
 	{
-		cout << "Gefunden: " << (*found) << endl;
+		std::cout << "Gefunden: " << (*found) << std::endl;
 	}
 }
 
@@ -93,7 +94,7 @@ void deleteElement(void)
 	}
 	printf("Welchen Key wollen Sie loeschen?\n");
 	string key;
-	cin << key;
+	std::cin >> key;
 	trie.erase(key);
 }
 
@@ -106,7 +107,7 @@ void findLowerBound(void)
 	}
 	printf("Nach welchem Key wollen Sie suchen?\n");
 	string key;
-	cin << key;
+	std::cin >> key;
 	auto found = trie.lower_bound(key);
 	if(found == trie.end())
 	{
@@ -114,7 +115,7 @@ void findLowerBound(void)
 	}
 	else
 	{
-		cout << "Gefunden: " << (*found) << endl;
+		std::cout << "Gefunden: " << (*found) << std::endl;
 	}
 }
 
@@ -127,7 +128,7 @@ void findUpperBound(void)
 	}
 	printf("Nach welchem Key wollen Sie suchen?\n");
 	string key;
-	cin << key;
+	std::cin >> key;
 	auto found = trie.upper_bound(key);
 	if(found == trie.end())
 	{
@@ -135,7 +136,7 @@ void findUpperBound(void)
 	}
 	else
 	{
-		cout << "Gefunden: " << (*found) << endl;
+		std::cout << "Gefunden: " << (*found) << std::endl;
 	}
 }
 
@@ -183,7 +184,7 @@ void menu(void)
 				break;
 			case 'e':	// Ist der Trie leer?
 			case 'E':
-				cout << trie.empty();
+				std::cout << trie.empty();
 				break;
 			case 'l':	// LowerBound ausgeben.
 			case 'L':
