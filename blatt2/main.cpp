@@ -41,7 +41,8 @@ void test(void)
 	printf("t.find('kuhl') = '%s'\n", (*found).c_str());
 	printf("t.find('xuxu') = '%s'\n", (*found2).c_str());
 
-	trie.erase(string("xuxu"));
+	printf("t.erase('xuxu');\n");
+	t.erase(string("xuxu"));
 	t.print();
 
 	t.clear();
