@@ -165,7 +165,7 @@ protected:
 			if (depth > 0)
 				printf("%*s⌙", depth * 2 - 1, "");
 
-			cout << Node::id == 0 ? 'R' : Node::id << " (this=" << this
+			cout << (Node::id == 0 ? 'R' : Node::id) << " (this=" << this
 				 << " parent=" << Node::get_parent() << endl;
 			//printf("%c (this=%p parent=%p):\n",
 			    //Node::id == 0 ? 'R' : Node::id, this,
@@ -365,14 +365,14 @@ public:
 		Leaf *current = it.get_current();
 		// Id merken und Eltern-Knoten suchen.
 		E id = current->getId();
-		InnerNode* parent = current->get_parent();
+		InnerNode* parent = (InnerNode*)(current->get_parent());
 		// Das Kind im Eltern-Knoten löschen
 		parent->remove_child(id);
 		while (!parent->has_children())
 		{
 			// Wenn es das letzte Kind war, auch den Eltern-Knoten löschen.
 			id = parent->getId();
-			parent = parent->get_parent();
+			parent = (InnerNode*)(parent->get_parent());
 			parent->remove_child(id);
 		}
 
@@ -390,8 +390,26 @@ public:
 		root_node.print(0);
 	}
 
-//	iterator lower_bound(const key_type& testElement);	// first element >= testElement
-//	iterator upper_bound(const key_type& testElement);	// first element > testElement
+	// first element >= testElement
+	iterator lower_bound(const key_type& testElement){
+		iterator it = begin();
+		while(it != end() && it.get_key().compare(testElement) < 0)
+		{
+			it ++;
+		}
+		return it;
+	}
+
+	// first element > testElement
+	iterator upper_bound(const key_type& testElement){
+		iterator it = begin();
+		while(it != end() && it.get_key().compare(testElement) <= 0)
+		{
+			it ++;
+		}
+		return it;
+	}
+
 	iterator find(const key_type &testElement) {			// first element == testElement
 		auto it = begin();
 		while (it != end() && it.get_key().compare(testElement) != 0) {
