@@ -38,7 +38,7 @@ protected:
 	class Node {
 	public:
 		Node(E my_id, Node *my_parent): id(my_id), parent(my_parent) {};
-		~Node() {};
+		virtual ~Node() {};
 		virtual void print(int depth) const = 0;
 
 		E getId() const {
@@ -60,6 +60,7 @@ protected:
 		Leaf(T param, Node *my_parent) : Node(TERMINAL, my_parent) {
 			value = param;
 		}
+		~Leaf() {};
 
 		void print(int depth) const {
 			printf("%*s", depth * 2, "");
