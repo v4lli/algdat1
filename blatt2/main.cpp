@@ -214,8 +214,6 @@ void menu(void)
 }
 
 int main(void) {
-	//menu();
-	test();
-
+	menu();
 	return 0;
 }
