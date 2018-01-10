@@ -216,7 +216,7 @@ protected:
 
 		void remove_child(E child_id)
 		{
-			children.erase(Node::id);
+			children.erase(child_id);
 		}
 
 		void attach(Leaf* child)
