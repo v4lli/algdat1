@@ -6,9 +6,6 @@
  *
  * - print mit << >> machen anstatt mit printf(), da %s nur fuer T=string
  *   korrekt ist
- * - lower_bound() und upper_bound() implementieren
- * - erase implementieren
- * - hauptprogramm schreiben
  * - insert mit bereits existierendem wert
  * - ggf. alles effizienter machen indem InnerNode keine map mehr enthaelt
  *   sondern eine sortierte liste o.ae.
@@ -383,6 +380,8 @@ public:
 			parent = (InnerNode*)(parent->get_parent());
 			parent->remove_child(id);
 		}
+
+		delete current;
 
 		// XXX Evtl:
 		//		Den Eltern-Knoten suchen (vom Blatt aus),
