@@ -41,6 +41,9 @@ void test(void)
 	printf("t.find('kuhl') = '%s'\n", (*found).c_str());
 	printf("t.find('xuxu') = '%s'\n", (*found2).c_str());
 
+	trie.erase(string("xuxu"));
+	t.print();
+
 	t.clear();
 }
 
@@ -48,13 +51,13 @@ void insertElement(void)
 {
 	printf("Element angeben in der Form:\n");
 	printf("Key Value\n");
-	string key_value;
-	std::cin >> key_value;
-	string::size_type found = key_value.find(" ");
-	if(found != string::npos)
+	string key;
+	string value;
+	std::cin >> key;
+	std::cin >> value;
+
+	if(key.length() > 0 && value.length() > 0)
 	{
-		string key = key_value.substr(0, found);
-		string value = key_value.substr(found + 1, string::npos);
 		trie.insert(std::make_pair(key, value));
 		printf("Erfolgreich eingefügt\n");
 	}
@@ -146,16 +149,17 @@ void menu(void)
 	while(run)
 	{
 		// Menü anzeigen.
-		printf("Was wollen Sie tun?\n");
-		printf("i -> Eingabe von Elementen\n");
-		printf("f -> Suche nach Element\n");
-		printf("d -> Ein Element loeschen\n");
+		printf("\n\nWas wollen Sie tun?\n");
 		printf("c -> Alle Elemente loeschen\n");
-		printf("p -> Alle Elemente ausgeben\n");
+		printf("d -> Ein Element loeschen\n");
 		printf("e -> Ist der Trie leer?\n");
+		printf("f -> Suche nach Element\n");
+		printf("i -> Eingabe von Elementen\n");
 		printf("l -> Finde LowerBound\n");
-		printf("u -> Finde UpperBound\n");
+		printf("p -> Alle Elemente ausgeben\n");
 		printf("q -> Programm beenden\n");
+		printf("t -> Selbsttest ausfuehren\n");
+		printf("u -> Finde UpperBound\n");
 
 		// Eingabe lesen.
 		char c = 0;
@@ -188,11 +192,15 @@ void menu(void)
 				break;
 			case 'l':	// LowerBound ausgeben.
 			case 'L':
-				//findLowerBound();
+				findLowerBound();
 				break;
 			case 'u':	// UpperBound ausgeben.
 			case 'U':
-				//findUpperBound();
+				findUpperBound();
+				break;
+			case 't':	// Selbsttest ausfuehren
+			case 'T':
+				test();
 				break;
 			case 'q':	// Programm beenden.
 			case 'Q':
@@ -205,8 +213,8 @@ void menu(void)
 }
 
 int main(void) {
-	test();
 	//menu();
+	test();
 
 	return 0;
 }
