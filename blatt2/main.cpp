@@ -23,6 +23,8 @@ void test(void)
 	auto kuku = t.insert(std::make_pair(string("kuku"), string("🦉")));
 	auto new_branch = t.insert(std::make_pair(string("xuxu"), string("🤬")));
 	t.print();
+	t.insert(std::make_pair(string("xuxu"), string("new xuxu")));
+	t.print();
 
 	printf("t.empty()=%d\n", t.empty());
 	printf("iterator deref for key 'kuhl': %s\n", (*print_later).c_str());

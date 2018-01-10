@@ -13,7 +13,8 @@ debug: main
 	lldb ./main
 
 clean:
-	rm -f main *.o
+	rm -f main *.o .DS_Store
+	rm -rf main.dSYM/
 
 valgrind: main
 	valgrind --leak-check=full ./main

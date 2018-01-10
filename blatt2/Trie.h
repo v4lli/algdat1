@@ -4,13 +4,7 @@
 /*
  * TODO
  *
- * - print mit << >> machen anstatt mit printf(), da %s nur fuer T=string
- *   korrekt ist
  * - insert mit bereits existierendem wert
- * - ggf. alles effizienter machen indem InnerNode keine map mehr enthaelt
- *   sondern eine sortierte liste o.ae.
- * - faedelung statt parent-zeiger fuer find() und iterator++ implementieren
- * - iterator.get_key() effizienter machen (evtl key im leaf speichern?)
  */
 
 #include <cassert>
@@ -62,11 +56,8 @@ protected:
 
 		void print(int depth) const {
 			printf("%*s", depth * 2, "");
-			// XXX Wert mit ausgeben... %s evtl falsch, lieber mit << >>
 			cout << "\"" << value << "\" (this=" << this
 				 << "p=" << Node::get_parent() << endl;
-			//printf("\"%s\" (this=%p p=%p)\n", value.c_str(), this,
-			    //Node::get_parent());
 		}
 
 		T& get() {
