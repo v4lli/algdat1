@@ -1,11 +1,9 @@
+// algorithmen und datenstrukturen, ws17/18, walter/dornauer
+//
+// https://github.com/v4lli/algdat1/tree/master/blatt2
+
 #ifndef TRIE_H_
 #define TRIE_H_
-
-/*
- * TODO
- *
- * - insert mit bereits existierendem wert
- */
 
 #include <cassert>
 #include <cstring>
@@ -92,11 +90,11 @@ protected:
 		// Nothing to do here, value is an object variable
 		void clear() { }
 
-		// return pointer to logically next leaf, or NULL if this is
+		// return pointer to logical next leaf, or NULL if this is
 		// the last element.
 		Leaf* find_next() const {
 			// find the fist node of the next branch of the tree
-			// (will be in next).
+			// (will be in next after the while loop).
 			Node *next = NULL;
 			// 1.) go up by one
 			InnerNode *parent = (InnerNode*)Node::get_parent();
@@ -159,9 +157,6 @@ protected:
 
 			cout << (Node::id == 0 ? 'R' : Node::id) << " (this=" << this
 				 << " parent=" << Node::get_parent() << endl;
-			//printf("%c (this=%p parent=%p):\n",
-			    //Node::id == 0 ? 'R' : Node::id, this,
-			    //Node::get_parent());
 
 			for(auto itr = children.begin(); itr != children.end(); ++itr) {
 				(*(*itr).second).print(depth + 1);
@@ -252,7 +247,7 @@ protected:
 			}
 		}
 	private:
-		map<E, Node*> children;		// XXX evtl. auch austauschen in Sortierte Liste.
+		map<E, Node*> children;
 	};
 
 public:
@@ -374,7 +369,7 @@ public:
 
 		delete current;
 
-		// XXX Evtl:
+		// alternativ Evtl:
 		//		Den Eltern-Knoten suchen (vom Blatt aus),
 		//		der mehr als ein Kind hat und dort den
 		//		entsprechenden Teilbaum mit clear löschen.
