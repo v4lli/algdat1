@@ -323,29 +323,6 @@ public:
 		return !root_node.has_children();
 	}
 
-	iterator insert(const value_type& value) {
-#ifdef DEBUG
-		printf("Inserting value for key %s\n", value.first.c_str());
-#endif
-		InnerNode *n = &root_node;
-#ifdef DEBUG
-		printf("%s: root_node=%p\n", __func__, n);
-#endif
-		for (int i = 0; i < value.first.length(); i++) {
-#ifdef DEBUG
-			printf("Searching inner node for char '%c'\n", value.first[i]);
-#endif
-			n = n->get_reference_or_create(value.first[i]);
-#ifdef DEBUG
-			printf("%s: root_node=%p\n", __func__, n);
-#endif
-		}
-		// We now have the InnerNode to attach the value (Leaf) to in n
-		Leaf *new_leaf;
-		n->attach(new_leaf = new Leaf(value.second, n));
-		return iterator(new_leaf, this);
-	}
-
 	void erase(const key_type& value){
 		// Das Kind finden, das zu löschen ist.
 		auto it = find(value);
@@ -420,6 +397,37 @@ public:
 
 	iterator end() {
 		return iterator(NULL, this);
+	}
+
+	iterator insert(const value_type& value) {
+#ifdef DEBUG
+		printf("Inserting value for key %s\n", value.first.c_str());
+#endif
+		if(find(value.first) != end())
+		{
+#ifdef DEBUG
+		printf("Key %s already existing\n", value.first.c_str());
+#endif
+			erase(value.first);
+		}
+
+		InnerNode *n = &root_node;
+#ifdef DEBUG
+		printf("%s: root_node=%p\n", __func__, n);
+#endif
+		for (int i = 0; i < value.first.length(); i++) {
+#ifdef DEBUG
+			printf("Searching inner node for char '%c'\n", value.first[i]);
+#endif
+			n = n->get_reference_or_create(value.first[i]);
+#ifdef DEBUG
+			printf("%s: root_node=%p\n", __func__, n);
+#endif
+		}
+		// We now have the InnerNode to attach the value (Leaf) to in n
+		Leaf *new_leaf;
+		n->attach(new_leaf = new Leaf(value.second, n));
+		return iterator(new_leaf, this);
 	}
 
 private:
